@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>輪跡天涯 - 環島專屬助理</title>
+    <style>
+        /* 基礎全域設定：採用深色模式，符合騎士戶外導航與科技感 */
+        :root {
+            --primary-color: #00ADB5;
+            --bg-dark: #222831;
+            --bg-card: #393E46;
+            --text-light: #EEEEEE;
+            --danger-color: #FF5722;
+            --warning-color: #FFC107;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* 模擬手機 APP 畫面寬度 */
+        .app-container {
+            width: 100%;
+            max-width: 414px; /* iPhone Max 寬度 */
+            min-height: 100vh;
+            background-color: var(--bg-dark);
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            padding-bottom: 20px;
+        }
+
+        /* 頂部標題列 */
+        header {
+            background-color: var(--bg-card);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid var(--primary-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+        }
+        
+        header p {
+            margin: 5px 0 0 0;
+            font-size: 0.8rem;
+            color: #AAA;
+        }
+
+        /* 內容區塊卡片排版 */
+        .module-card {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            margin: 15px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .module-title {
+            font-size: 1.1rem;
+            margin-top: 0;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            border-left: 4px solid var(--primary-color);
+            padding-left: 10px;
+        }
+
+        /* 模塊 1：天氣與避雨 (痛點1) */
+        .weather-alert {
+            background-color: rgba(255, 193, 7, 0.1);
+            border: 1px solid var(--warning-color);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        /* 模塊 2：燃料預測進度條 (痛點2) */
+        .fuel-bar-container {
+            background-color: #555;
+            border-radius: 10px;
+            height: 20px;
+            width: 100%;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .fuel-bar-fill {
+            background-color: var(--primary-color);
+            height: 100%;
+            width: 70%; /* 預設油量 */
+            transition: width 0.3s, background-color 0.3s;
+        }
+
+        .fuel-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+
+        .danger-text { color: var(--danger-color); font-weight: bold; }
+
+        /* 模塊 3：友善住宿標籤 (痛點3) */
+        .tag-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tag {
+            background-color: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .filter-tag.active {
+            background-color: var(--primary-color);
+            color: var(--bg-dark);
+        }
+
+        /* 模塊 4：SOS 緊急按鈕 (痛點4) */
+        .sos-btn {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px;
+            width: 100%;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(255, 87, 34, 0.4);
+        }
+        
+        .sos-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* 模塊 5：成就系統 (痛點5) */
+        .achievement-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .badge {
+            background-color: #2a2f36;
+            text-align: center;
+            padding: 15px 5px;
+            border-radius: 8px;
+            border: 1px dashed #555;
+        }
+
+        /* 互動用滑桿 (僅供展示概念用) */
+        .demo-controls {
+            margin-top: 30px;
+            padding: 15px;
+            border-top: 1px solid #555;
+            font-size: 0.8rem;
+            color: #AAA;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <h1>輪跡天涯</h1>
+        <p>目前綁定車輛：KYMCO 125cc 大地名流</p>
+    </header>
+
+    <div class="module-card">
+        <h2 class="module-title">🌤️ 即時路段天氣預警</h2>
+        <div class="weather-alert">
+            <strong>⚠️ 前方路況注意</strong><br>
+            預計 15 分鐘後（台9線 420K 處）有陣雨。<br>
+            距離最近避雨點：全家便利商店 (2.5 km)
+        </div>
+    </div>
+
+    <div class="module-card">
+        <h2 class="module-title">⛽ 燃料智慧預測</h2>
+        <p style="margin:0; font-size:0.9rem;">距離下一站加油站：<strong id="next-station-dist">35</strong> km</p>
+        
+        <div class="fuel-bar-container">
+            <div class="fuel-bar-fill" id="fuel-level"></div>
+        </div>
+        
+        <div class="fuel-stats">
+            <span id="fuel-percent-text">剩餘油量：70%</span>
+            <span id="range-text">預估可行駛：140 km</span>
+        </div>
+        <p id="fuel-warning" class="danger-text" style="display: none; margin-top: 10px;">
+            ⚠️ 警告：預估里程不足以抵達下一站，請立即掉頭或呼叫道路救援！
+        </p>
+    </div>
+
+    <div class="module-card">
+        <h2 class="module-title">🏨 友善住宿雷達</h2>
+        <p style="font-size: 0.8rem; color: #AAA;">篩選周邊認證之機車友善民宿</p>
+        <div class="tag-container">
+            <button class="filter-tag active" onclick="toggleTag(this)">專屬室內停車</button>
+            <button class="filter-tag" onclick="toggleTag(this)">洗車區提供</button>
+            <button class="filter-tag" onclick="toggleTag(this)">防雨遮蓋</button>
+        </div>
+    </div>
+
+    <div class="module-card" style="text-align: center;">
+        <h2 class="module-title">🚑 體力透支與緊急救援</h2>
+        <p style="font-size: 0.8rem; color: #AAA; margin-bottom: 15px;">將傳送您的 GPS 座標至最近醫療與機車行</p>
+        <button class="sos-btn" onclick="triggerSOS()">SOS 一鍵呼叫</button>
+    </div>
+
+    <div class="module-card">
+        <h2 class="module-title">📖 旅程成就認證</h2>
+        <div class="achievement-grid">
+            <div class="badge">
+                <div style="font-size: 1.5rem;">🏅</div>
+                <div style="margin-top: 5px;">壽卡征服者</div>
+            </div>
+            <div class="badge">
+                <div style="font-size: 1.5rem;">🗺️</div>
+                <div style="margin-top: 5px;">109,72 km<br>結業徽章</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-controls">
+        <p>👨‍💻 展示控制區 (模擬油耗消耗)：</p>
+        <label for="fuel-slider">目前油量：</label>
+        <input type="range" id="fuel-slider" min="0" max="100" value="70" oninput="updateFuelLogic(this.value)" style="width: 100%;">
+    </div>
+
+</div>
+
+<script>
+    // 嚴格依照附檔邏輯實作的 JavaScript
+
+    // --- 住宿標籤切換邏輯 ---
+    function toggleTag(btn) {
+        btn.classList.toggle('active');
+    }
+
+    // --- SOS 按鈕邏輯 ---
+    function triggerSOS() {
+        // 模擬取得經緯度與呼叫救援的行為
+        alert("🚨 已啟動緊急救援程序！\n\n系統已定位您的位置：\n經度 120.8°E, 緯度 22.2°N (南迴公路段)\n\n已通報最近的：\n1. 大武鄉衛生所\n2. 達仁機車行\n\n請保持冷靜並移動至安全路肩等待。");
+    }
+
+    // --- 燃料智慧計算邏輯 ---
+    // 假設 125cc 大地名流 滿油可行駛 200 km
+    const MAX_RANGE_KM = 200; 
+    const NEXT_STATION_KM = 35; // 假設距離下一站固定為 35 公里
+
+    function updateFuelLogic(fuelPercentage) {
+        const fuelBar = document.getElementById('fuel-level');
+        const rangeText = document.getElementById('range-text');
+        const percentText = document.getElementById('fuel-percent-text');
+        const warning = document.getElementById('fuel-warning');
+
+        // 更新進度條 UI
+        fuelBar.style.width = fuelPercentage + '%';
+        percentText.innerText = '剩餘油量：' + fuelPercentage + '%';
+
+        // 依比例計算預估可行駛里程
+        const estimatedRange = Math.round((fuelPercentage / 100) * MAX_RANGE_KM);
+        rangeText.innerText = '預估可行駛：' + estimatedRange + ' km';
+
+        // 判斷邏輯：若可行駛距離小於下一站距離，觸發警報變色
+        if (estimatedRange < NEXT_STATION_KM) {
+            fuelBar.style.backgroundColor = 'var(--danger-color)';
+            rangeText.classList.add('danger-text');
+            warning.style.display = 'block';
+        } else {
+            // 恢復正常顏色
+            fuelBar.style.backgroundColor = 'var(--primary-color)';
+            rangeText.classList.remove('danger-text');
+            warning.style.display = 'none';
+        }
+    }
+</script>
+
+</body>
+</html>
