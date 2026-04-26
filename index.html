@@ -41,7 +41,6 @@
         * { box-sizing: border-box; }
 
         body {
-            /* 夜騎背景：微型十字網格，模擬儀表板底紋 */
             background-color: var(--bg-void);
             background-image:
                 linear-gradient(var(--border) 1px, transparent 1px),
@@ -62,8 +61,7 @@
             max-width: 414px;
             min-height: 100vh;
             position: relative;
-            padding-bottom: 90px; /* 為底部導航留空 */
-            /* 微弱的頂部氖光暈染效果 */
+            padding-bottom: 90px;
             box-shadow:
                 0 0 60px rgba(0, 212, 224, 0.04),
                 inset 0 0 60px rgba(0,0,0,0.3);
@@ -84,10 +82,7 @@
             justify-content: space-between;
         }
 
-        .header-brand {
-            display: flex;
-            flex-direction: column;
-        }
+        .header-brand { display: flex; flex-direction: column; }
 
         header h1 {
             margin: 0;
@@ -109,7 +104,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* 狀態指示燈 */
         .status-dot {
             display: flex;
             align-items: center;
@@ -143,13 +137,11 @@
             padding: 18px;
             position: relative;
             overflow: hidden;
-            /* 入場動畫 */
             opacity: 0;
             transform: translateY(16px);
             animation: card-enter 0.5s ease forwards;
         }
 
-        /* 卡片入場錯落動畫 */
         .module-card:nth-child(1) { animation-delay: 0.05s; }
         .module-card:nth-child(2) { animation-delay: 0.15s; }
         .module-card:nth-child(3) { animation-delay: 0.25s; }
@@ -161,7 +153,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 卡片左側氖光邊線 */
         .module-card::before {
             content: '';
             position: absolute;
@@ -173,7 +164,6 @@
             border-radius: 0 3px 3px 0;
         }
 
-        /* 卡片右上角裝飾角落 */
         .module-card::after {
             content: '';
             position: absolute;
@@ -199,9 +189,7 @@
             text-transform: uppercase;
         }
 
-        .module-title .icon {
-            font-size: 1.1rem;
-        }
+        .module-title .icon { font-size: 1.1rem; }
 
         /* ══════════════════════════════
            模組 1：天氣預警
@@ -231,6 +219,7 @@
             line-height: 1.6;
         }
 
+        /* 【優化1】天氣避雨點 Badge 改為可點擊樣式，給予明確 cursor 提示 */
         .weather-badge {
             display: inline-flex;
             align-items: center;
@@ -242,9 +231,16 @@
             font-size: 0.75rem;
             color: var(--primary);
             margin-top: 8px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+            user-select: none;
         }
 
-        /* 計時倒數 */
+        .weather-badge:hover {
+            background: rgba(0, 212, 224, 0.2);
+            transform: translateX(2px);
+        }
+
         .countdown-bar {
             height: 3px;
             background: var(--bg-void);
@@ -276,15 +272,8 @@
             margin-bottom: 12px;
         }
 
-        /* 圓形儀表 */
-        .fuel-circle {
-            position: relative;
-            flex-shrink: 0;
-        }
-
-        .fuel-circle svg {
-            transform: rotate(-90deg);
-        }
+        .fuel-circle { position: relative; flex-shrink: 0; }
+        .fuel-circle svg { transform: rotate(-90deg); }
 
         .fuel-circle .circle-bg {
             fill: none;
@@ -298,7 +287,7 @@
             stroke-width: 8;
             stroke-linecap: round;
             stroke-dasharray: 220;
-            stroke-dashoffset: 66; /* 70% → offset = 220 * 0.30 = 66 */
+            stroke-dashoffset: 66;
             filter: drop-shadow(0 0 4px var(--primary));
             transition: stroke-dashoffset 0.6s ease, stroke 0.3s;
         }
@@ -328,9 +317,7 @@
             margin-top: 2px;
         }
 
-        .fuel-info {
-            flex: 1;
-        }
+        .fuel-info { flex: 1; }
 
         .fuel-stat-row {
             display: flex;
@@ -342,7 +329,6 @@
         }
 
         .fuel-stat-row:last-child { border-bottom: none; }
-
         .fuel-stat-label { color: var(--text-secondary); }
         .fuel-stat-value {
             font-family: 'Exo 2', sans-serif;
@@ -381,6 +367,19 @@
             gap: 6px;
         }
 
+        /* 【優化2】住宿數量加入數字切換動畫 */
+        #accommodation-count {
+            color: var(--primary);
+            font-weight: 700;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+            display: inline-block;
+        }
+
+        #accommodation-count.updating {
+            transform: translateY(-4px);
+            opacity: 0;
+        }
+
         .tag-container {
             display: flex;
             gap: 8px;
@@ -417,7 +416,6 @@
            模組 4：SOS 按鈕
            ══════════════════════════════ */
         .sos-card {
-            /* SOS 卡片使用特殊危險主題 */
             background: linear-gradient(135deg, rgba(255,87,34,0.08), rgba(255,87,34,0.02));
             border-color: rgba(255,87,34,0.2);
         }
@@ -444,7 +442,6 @@
             justify-content: center;
         }
 
-        /* SOS 雙層脈衝光環 */
         .sos-ring {
             position: absolute;
             inset: -8px;
@@ -477,12 +474,16 @@
             text-transform: uppercase;
             cursor: pointer;
             position: relative;
+            overflow: hidden; /* 【優化3】必須設為 hidden 以讓進度填充不溢出 */
             box-shadow:
                 0 4px 20px rgba(255, 87, 34, 0.45),
                 0 0 40px rgba(255, 87, 34, 0.15),
                 inset 0 1px 0 rgba(255,255,255,0.15);
-            transition: all 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
             z-index: 1;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent; /* 消除手機點擊藍色高光 */
         }
 
         .sos-btn:hover {
@@ -493,8 +494,146 @@
                 inset 0 1px 0 rgba(255,255,255,0.15);
         }
 
-        .sos-btn:active {
-            transform: scale(0.97) translateY(0);
+        .sos-btn:active { transform: scale(0.97) translateY(0); }
+
+        /* 【優化3】SOS 按鈕長按進度填充層 */
+        .sos-btn-fill {
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,0.25);
+            transform: scaleX(0);
+            transform-origin: left center;
+            border-radius: inherit;
+            pointer-events: none;
+            /* transition 由 JS 動態設定 */
+        }
+
+        /* ══════════════════════════════
+           【優化4】SOS 自製確認 Modal
+           取代原本的 alert()，提供更好的 UX
+           ══════════════════════════════ */
+        .sos-modal-overlay {
+            display: none; /* 預設隱藏 */
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .sos-modal-overlay.visible {
+            display: flex;
+            animation: modal-in 0.3s ease;
+        }
+
+        @keyframes modal-in {
+            from { opacity: 0; transform: scale(0.92); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+
+        .sos-modal {
+            background: linear-gradient(135deg, #1C1014, #2A1018);
+            border: 1px solid rgba(255, 87, 34, 0.5);
+            border-radius: 20px;
+            padding: 24px 20px;
+            width: 100%;
+            max-width: 340px;
+            box-shadow:
+                0 0 60px rgba(255, 87, 34, 0.3),
+                0 20px 60px rgba(0,0,0,0.7);
+        }
+
+        .sos-modal-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Exo 2', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--danger);
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+        }
+
+        .sos-modal-pulse {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--danger);
+            box-shadow: 0 0 10px var(--danger);
+            animation: pulse-dot 1s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+
+        .sos-modal-coords {
+            background: rgba(255, 87, 34, 0.08);
+            border: 1px solid rgba(255, 87, 34, 0.2);
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            margin-bottom: 14px;
+            line-height: 1.8;
+            font-family: 'Exo 2', sans-serif;
+        }
+
+        .sos-modal-coords strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .sos-modal-contacts {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .sos-contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 0.8rem;
+        }
+
+        .sos-contact-icon { font-size: 1.1rem; }
+
+        .sos-contact-name {
+            flex: 1;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .sos-contact-status {
+            font-size: 0.68rem;
+            color: var(--success);
+            font-family: 'Exo 2', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        .sos-modal-close {
+            width: 100%;
+            background: transparent;
+            border: 1px solid var(--border-hi);
+            color: var(--text-secondary);
+            padding: 12px;
+            border-radius: var(--radius-pill);
+            font-family: 'Noto Sans TC', sans-serif;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .sos-modal-close:hover {
+            border-color: var(--primary);
+            color: var(--primary);
         }
 
         /* ══════════════════════════════
@@ -555,27 +694,111 @@
 
         /* 鎖定狀態徽章 */
         .badge.locked {
-            opacity: 0.4;
+            opacity: 0.45;
             filter: grayscale(1);
+            cursor: pointer; /* 【優化5】鎖定徽章可點擊，讓使用者知道有互動 */
         }
 
         .badge.locked:hover {
-            transform: none;
-            border-color: var(--border);
-            background: linear-gradient(135deg, rgba(0,212,224,0.05), rgba(0,0,0,0.2));
+            opacity: 0.7;
+            filter: grayscale(0.5);
+            transform: translateY(-1px);
+            border-color: rgba(255,255,255,0.15);
+            background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(0,0,0,0.2));
+            box-shadow: none;
+        }
+
+        /* 【優化5】鎖定徽章的解鎖條件 Tooltip */
+        .badge-unlock-hint {
+            display: none;
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(22, 27, 34, 0.97);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            z-index: 50;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            pointer-events: none;
+        }
+
+        .badge-unlock-hint::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: rgba(22, 27, 34, 0.97);
+        }
+
+        .badge.locked:hover .badge-unlock-hint,
+        .badge.locked.show-hint .badge-unlock-hint {
+            display: block;
+            animation: hint-in 0.15s ease;
+        }
+
+        @keyframes hint-in {
+            from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+            to   { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
 
         /* ══════════════════════════════
-           展示控制區
+           【優化6】展示控制區 — 折疊收合
            ══════════════════════════════ */
         .demo-controls {
             margin: 14px 14px 0;
-            padding: 14px;
             background: var(--bg-card);
             border: 1px dashed var(--text-dim);
             border-radius: var(--radius-card);
             font-size: 0.75rem;
             color: var(--text-dim);
+            overflow: hidden;
+        }
+
+        .demo-controls-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        .demo-controls-toggle:hover {
+            background: rgba(255,255,255,0.03);
+        }
+
+        .demo-controls-toggle .toggle-label {
+            font-family: 'Exo 2', sans-serif;
+            letter-spacing: 1px;
+            font-size: 0.72rem;
+            color: var(--text-dim);
+        }
+
+        .demo-controls-toggle .toggle-arrow {
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            transition: transform 0.25s;
+        }
+
+        .demo-controls.expanded .toggle-arrow {
+            transform: rotate(180deg);
+        }
+
+        .demo-controls-body {
+            display: none; /* 預設收合 */
+            padding: 0 14px 14px;
+        }
+
+        .demo-controls.expanded .demo-controls-body {
+            display: block;
         }
 
         .demo-controls label {
@@ -592,9 +815,7 @@
             cursor: pointer;
         }
 
-        /* ══════════════════════════════
-           底部導航列 (固定)
-           ══════════════════════════════ */
+        /* ── 底部導航列 ── */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -611,6 +832,7 @@
             z-index: 200;
         }
 
+        /* 【優化7】導航項目加入 ripple 點擊回饋 */
         .nav-item {
             display: flex;
             flex-direction: column;
@@ -620,6 +842,25 @@
             transition: all 0.2s;
             padding: 4px 12px;
             border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--primary-glow2);
+            opacity: 0;
+            border-radius: inherit;
+            transform: scale(0);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .nav-item:active::after {
+            transform: scale(1);
+            opacity: 1;
+            transition: none;
         }
 
         .nav-item.active .nav-icon {
@@ -641,9 +882,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* ══════════════════════════════
-           頁腳
-           ══════════════════════════════ */
+        /* ── 頁腳 ── */
         footer {
             text-align: center;
             padding: 16px 20px;
@@ -653,6 +892,9 @@
             line-height: 1.8;
             margin: 14px 14px 0;
         }
+
+        /* ── Scroll 行為 ── */
+        html { scroll-behavior: smooth; }
     </style>
 </head>
 <body>
@@ -668,7 +910,8 @@
     </header>
 
     <!-- ── 模組 1：天氣預警 ── -->
-    <div class="module-card">
+    <!-- 【優化7】加入 id，供底部導航捲動用 -->
+    <div class="module-card" id="section-home">
         <h2 class="module-title"><span class="icon">🌤️</span>路段天氣預警</h2>
         <div class="weather-alert">
             <div class="alert-header">⚠ 前方雨勢警告</div>
@@ -676,7 +919,8 @@
                 預計 <strong style="color: var(--warning)">15 分鐘後</strong>，台9線 420K 處將有陣雨。<br>
                 最近避雨點：全家便利商店 (2.5 km)
             </div>
-            <span class="weather-badge">🏪 最近避雨點 2.5 km →</span>
+            <!-- 【優化1】badge 加入 title 屬性作最基本的功能提示 -->
+            <span class="weather-badge" title="前往地圖查看避雨點">🏪 最近避雨點 2.5 km →</span>
             <div class="countdown-bar">
                 <div class="countdown-fill"></div>
             </div>
@@ -684,7 +928,7 @@
     </div>
 
     <!-- ── 模組 2：燃料預測 ── -->
-    <div class="module-card">
+    <div class="module-card" id="section-fuel">
         <h2 class="module-title"><span class="icon">⛽</span>燃料智慧預測</h2>
         <div class="fuel-gauge-wrapper">
             <!-- 圓形儀表盤 -->
@@ -720,21 +964,23 @@
     </div>
 
     <!-- ── 模組 3：住宿篩選 ── -->
-    <div class="module-card">
+    <div class="module-card" id="section-accommodation">
         <h2 class="module-title"><span class="icon">🏨</span>友善住宿雷達</h2>
         <div class="accommodation-header">
-            📍 周邊 10 km 內共找到 <strong style="color: var(--primary)">8</strong> 間認證機車友善住宿
+            <!-- 【優化2】count 數字獨立為 span，方便 JS 動態更新 -->
+            📍 周邊 10 km 內共找到 <span id="accommodation-count">8</span> 間認證機車友善住宿
         </div>
         <div class="tag-container">
-            <button class="filter-tag active" onclick="toggleTag(this)">🔒 室內停車</button>
-            <button class="filter-tag" onclick="toggleTag(this)">🚿 洗車區</button>
-            <button class="filter-tag" onclick="toggleTag(this)">☂️ 防雨遮蓋</button>
-            <button class="filter-tag" onclick="toggleTag(this)">🔧 工具借用</button>
+            <!-- 【優化2】每個 tag 帶有 data-count，表示勾選此選項可顯示的住宿數量（模擬資料） -->
+            <button class="filter-tag active" data-tag="parking"  data-count="8" onclick="toggleTag(this)">🔒 室內停車</button>
+            <button class="filter-tag"        data-tag="shower"   data-count="5" onclick="toggleTag(this)">🚿 洗車區</button>
+            <button class="filter-tag"        data-tag="rain"     data-count="6" onclick="toggleTag(this)">☂️ 防雨遮蓋</button>
+            <button class="filter-tag"        data-tag="tools"    data-count="3" onclick="toggleTag(this)">🔧 工具借用</button>
         </div>
     </div>
 
     <!-- ── 模組 4：SOS 緊急救援 ── -->
-    <div class="module-card sos-card">
+    <div class="module-card sos-card" id="section-sos">
         <h2 class="module-title"><span class="icon">🚑</span>緊急救援</h2>
         <p class="sos-subtitle">
             一鍵傳送 GPS 座標至最近醫療院所與機車行<br>
@@ -743,7 +989,18 @@
         <div class="sos-btn-wrapper">
             <div class="sos-ring"></div>
             <div class="sos-ring"></div>
-            <button class="sos-btn" id="sos-btn" onmousedown="startSOS()" onmouseup="cancelSOS()" ontouchstart="startSOS()" ontouchend="cancelSOS()">
+            <button
+                class="sos-btn"
+                id="sos-btn"
+                onmousedown="startSOS(event)"
+                onmouseup="cancelSOS(event)"
+                onmouseleave="cancelSOS(event)"
+                ontouchstart="startSOS(event)"
+                ontouchend="cancelSOS(event)"
+                ontouchcancel="cancelSOS(event)"
+            >
+                <!-- 【優化3】進度填充層 -->
+                <div class="sos-btn-fill" id="sos-fill"></div>
                 SOS 救援
             </button>
         </div>
@@ -763,25 +1020,34 @@
                 <div class="badge-name">結業徽章</div>
                 <div class="badge-value">1,097.2 km</div>
             </div>
-            <div class="badge locked">
+            <!-- 【優化5】鎖定徽章加入 data-unlock 說明解鎖條件，並帶有 tooltip -->
+            <div class="badge locked" data-unlock="完成合歡山路段 (台14甲線) 即可解鎖" onclick="showBadgeHint(this)">
                 <div class="badge-icon">🏔️</div>
                 <div class="badge-name">合歡山破霧</div>
                 <div class="badge-value">待解鎖</div>
+                <div class="badge-unlock-hint">🔓 完成合歡山路段後解鎖</div>
             </div>
-            <div class="badge locked">
+            <div class="badge locked" data-unlock="抵達墾丁大灣拍攝落日即可解鎖" onclick="showBadgeHint(this)">
                 <div class="badge-icon">🌊</div>
                 <div class="badge-name">墾丁落日騎士</div>
                 <div class="badge-value">待解鎖</div>
+                <div class="badge-unlock-hint">🔓 抵達墾丁大灣後解鎖</div>
             </div>
         </div>
     </div>
 
-    <!-- ── 展示控制區 ── -->
-    <div class="demo-controls">
-        <p style="margin: 0 0 8px; font-family: 'Exo 2', sans-serif; letter-spacing: 1px;">DEV · 模擬油量控制</p>
-        <label for="fuel-slider">目前油量（拖曳模擬油耗）：</label>
-        <input type="range" id="fuel-slider" min="0" max="100" value="70"
-               oninput="updateFuelLogic(this.value)">
+    <!-- ── 展示控制區（折疊收合）── -->
+    <!-- 【優化6】預設收合，點擊 toggle 展開，不干擾正常使用者瀏覽體驗 -->
+    <div class="demo-controls" id="demo-controls">
+        <div class="demo-controls-toggle" onclick="toggleDemoControls()">
+            <span class="toggle-label">⚙ DEV · 模擬油量控制</span>
+            <span class="toggle-arrow">▼</span>
+        </div>
+        <div class="demo-controls-body">
+            <label for="fuel-slider">目前油量（拖曳模擬油耗）：</label>
+            <input type="range" id="fuel-slider" min="0" max="100" value="70"
+                   oninput="updateFuelLogic(this.value)">
+        </div>
     </div>
 
     <!-- 頁腳 -->
@@ -791,24 +1057,25 @@
     </footer>
 
     <!-- ── 底部導航列 ── -->
+    <!-- 【優化7】nav-item 加入 data-target，對應各模組的 section id -->
     <nav class="bottom-nav">
-        <div class="nav-item active">
+        <div class="nav-item active" data-target="section-home">
             <div class="nav-icon">🏠</div>
             <div class="nav-label">總覽</div>
         </div>
-        <div class="nav-item">
-            <div class="nav-icon">🗺️</div>
-            <div class="nav-label">地圖</div>
-        </div>
-        <div class="nav-item">
+        <div class="nav-item" data-target="section-fuel">
             <div class="nav-icon">⛽</div>
             <div class="nav-label">燃料</div>
         </div>
-        <div class="nav-item">
+        <div class="nav-item" data-target="section-accommodation">
             <div class="nav-icon">🏨</div>
             <div class="nav-label">住宿</div>
         </div>
-        <div class="nav-item">
+        <div class="nav-item" data-target="section-sos">
+            <div class="nav-icon">🚑</div>
+            <div class="nav-label">救援</div>
+        </div>
+        <div class="nav-item" data-target="section-home">
             <div class="nav-icon">👤</div>
             <div class="nav-label">我的</div>
         </div>
@@ -816,59 +1083,186 @@
 
 </div>
 
+<!-- ══════════════════════════════════════
+     【優化4】SOS 自製確認 Modal
+     放在 app-container 外，確保全畫面覆蓋
+     ══════════════════════════════════════ -->
+<div class="sos-modal-overlay" id="sos-modal-overlay">
+    <div class="sos-modal">
+        <div class="sos-modal-header">
+            <div class="sos-modal-pulse"></div>
+            🚨 緊急救援已啟動
+        </div>
+        <div class="sos-modal-coords">
+            <strong>📍 GPS 座標</strong><br>
+            120.8°E, 22.2°N<br>
+            <strong>📌 目前位置</strong><br>
+            台9線南迴公路段 · 大武鄉附近
+        </div>
+        <div class="sos-modal-contacts">
+            <div class="sos-contact-item">
+                <span class="sos-contact-icon">🏥</span>
+                <span class="sos-contact-name">大武鄉衛生所</span>
+                <span class="sos-contact-status">已通報 ✓</span>
+            </div>
+            <div class="sos-contact-item">
+                <span class="sos-contact-icon">🔧</span>
+                <span class="sos-contact-name">達仁機車行</span>
+                <span class="sos-contact-status">已通報 ✓</span>
+            </div>
+            <div class="sos-contact-item">
+                <span class="sos-contact-icon">📞</span>
+                <span class="sos-contact-name">道路救援 0800-000-000</span>
+                <span class="sos-contact-status">備用</span>
+            </div>
+        </div>
+        <p style="font-size: 0.75rem; color: var(--text-secondary); text-align: center; margin: 0 0 16px; line-height: 1.6;">
+            請移至安全路肩靜待救援<br>保持手機電量與定位開啟
+        </p>
+        <button class="sos-modal-close" onclick="closeSosModal()">我知道了，返回主畫面</button>
+    </div>
+</div>
+
 <script>
     /* ══════════════════════════════════════
-       嚴格依照原附檔邏輯實作，並新增互動優化
+       嚴格依照原附檔邏輯，並逐一修正使用者端問題
        ══════════════════════════════════════ */
 
-    // ── 住宿標籤切換 ──
+    // ──────────────────────────────────────
+    // 【優化2】住宿標籤切換 + 動態更新結果數量
+    // 邏輯：取所有「已啟用」tag 的 data-count 交集最小值
+    // （模擬多條件篩選後結果縮減的體驗）
+    // ──────────────────────────────────────
     function toggleTag(btn) {
         btn.classList.toggle('active');
+        updateAccommodationCount();
     }
 
-    // ── SOS 長按邏輯（原版改良：防止誤觸）──
-    let sosTimer = null;
-    let sosProgress = 0;
+    function updateAccommodationCount() {
+        const activeTags = document.querySelectorAll('.filter-tag.active');
+        const countEl    = document.getElementById('accommodation-count');
 
-    function startSOS() {
+        let newCount;
+        if (activeTags.length === 0) {
+            // 全部取消勾選 → 顯示所有 8 間
+            newCount = 8;
+        } else {
+            // 取所有已選 tag 的最低 data-count（模擬交集篩選縮減）
+            const counts = Array.from(activeTags).map(t => parseInt(t.dataset.count));
+            newCount = Math.min(...counts);
+        }
+
+        // 數字跳動動畫：先消失、更新數字、再出現
+        countEl.classList.add('updating');
+        setTimeout(() => {
+            countEl.textContent = newCount;
+            countEl.classList.remove('updating');
+        }, 200);
+    }
+
+    // ──────────────────────────────────────
+    // 【優化3 + 優化4】SOS 長按邏輯重寫
+    // 改進：進度填充視覺回饋 + 自製 Modal
+    // 防禦：同時處理 touch/mouse 雙重觸發問題
+    // ──────────────────────────────────────
+    const SOS_HOLD_MS   = 2000;
+    let   sosAnimFrame  = null;
+    let   sosStartTime  = null;
+    let   sosTriggered  = false;
+    let   sosPointerType = null; // 記錄觸發類型，防止 touch + mouse 雙重觸發
+
+    function startSOS(e) {
+        e.preventDefault();
+
+        // 防止 touchstart 後 mousedown 重複觸發
+        if (sosPointerType && sosPointerType !== e.type.replace('start','down').replace('touch','mouse')) {
+            return;
+        }
+        sosPointerType = e.type;
+
+        if (sosStartTime !== null) return; // 已經在按住中，防重複
+
+        sosStartTime = Date.now();
+        sosTriggered = false;
+
+        const btn  = document.getElementById('sos-btn');
+        const fill = document.getElementById('sos-fill');
+
+        btn.childNodes[btn.childNodes.length - 1].textContent = ' 按住中...'; // 更新文字節點
+
+        // 啟動進度填充 CSS transition
+        fill.style.transition = `transform ${SOS_HOLD_MS}ms linear`;
+        fill.style.transform  = 'scaleX(1)';
+
+        // 用 rAF 持續監聽是否到達 2 秒
+        function checkProgress() {
+            if (sosStartTime === null) return; // 已被取消
+            const elapsed = Date.now() - sosStartTime;
+            if (elapsed >= SOS_HOLD_MS && !sosTriggered) {
+                sosTriggered = true;
+                triggerSOS();
+                resetSosBtn();
+            } else {
+                sosAnimFrame = requestAnimationFrame(checkProgress);
+            }
+        }
+        sosAnimFrame = requestAnimationFrame(checkProgress);
+    }
+
+    function cancelSOS(e) {
+        e.preventDefault();
+        if (sosTriggered) return; // 已觸發則不重置
+        resetSosBtn();
+    }
+
+    function resetSosBtn() {
+        // 清除計時
+        if (sosAnimFrame) { cancelAnimationFrame(sosAnimFrame); sosAnimFrame = null; }
+        sosStartTime  = null;
+        sosPointerType = null;
+
+        // 重置進度填充（立即退場）
+        const fill = document.getElementById('sos-fill');
+        fill.style.transition = 'transform 0.25s ease';
+        fill.style.transform  = 'scaleX(0)';
+
+        // 重置按鈕文字
         const btn = document.getElementById('sos-btn');
-        btn.textContent = '按住中...';
-        sosTimer = setTimeout(() => {
-            triggerSOS();
-            btn.textContent = 'SOS 救援';
-        }, 2000); // 長按 2 秒後觸發
+        btn.childNodes[btn.childNodes.length - 1].textContent = ' SOS 救援';
     }
 
-    function cancelSOS() {
-        clearTimeout(sosTimer);
-        const btn = document.getElementById('sos-btn');
-        btn.textContent = 'SOS 救援';
-    }
-
+    // 【優化4】觸發 SOS → 顯示自製 Modal，取代 alert()
     function triggerSOS() {
-        alert("🚨 緊急救援已啟動\n\n📍 定位座標：120.8°E, 22.2°N（南迴公路段）\n\n已通報：\n→ 大武鄉衛生所\n→ 達仁機車行\n\n請保持冷靜，移動至安全路肩等待。");
+        const overlay = document.getElementById('sos-modal-overlay');
+        overlay.classList.add('visible');
+        sosTriggered = false; // 重置供下次使用
     }
 
-    // ── 燃料邏輯 (原版核心保留，新增圓形儀表盤同步) ──
-    const MAX_RANGE_KM = 200;   // 125cc 大地名流 滿油可行駛距離
-    const NEXT_STATION_KM = 35; // 距下一加油站距離（固定示範值）
-    const CIRCUMFERENCE = 2 * Math.PI * 35; // r=35 的圓周長 ≈ 220
+    function closeSosModal() {
+        document.getElementById('sos-modal-overlay').classList.remove('visible');
+    }
+
+    // ──────────────────────────────────────
+    // 燃料邏輯（原版核心保留，圓形儀表盤同步）
+    // ──────────────────────────────────────
+    const MAX_RANGE_KM   = 200;   // 125cc 大地名流 滿油可行駛距離
+    const NEXT_STATION_KM = 35;   // 距下一加油站距離（固定示範值）
+    const CIRCUMFERENCE  = 2 * Math.PI * 35; // r=35 的圓周長 ≈ 220
 
     function updateFuelLogic(fuelPercentage) {
         fuelPercentage = parseInt(fuelPercentage);
 
-        // ── 1. 更新圓形儀表盤 ──
+        // 1. 更新圓形儀表盤
         const circleFill = document.getElementById('circle-fill');
         const percentNum  = document.getElementById('fuel-percent-num');
 
-        // strokeDashoffset：0 = 全滿，CIRCUMFERENCE = 全空
         const offset = CIRCUMFERENCE * (1 - fuelPercentage / 100);
         circleFill.style.strokeDasharray  = CIRCUMFERENCE;
         circleFill.style.strokeDashoffset = offset;
         percentNum.textContent = fuelPercentage;
 
-        // ── 2. 依油量變更儀表顏色 ──
-        if (fuelPercentage <= 17.5) { // 17.5% = 可行駛 35km 臨界值
+        // 2. 依油量變更儀表顏色
+        if (fuelPercentage <= 17.5) {
             circleFill.style.stroke = 'var(--danger)';
             circleFill.style.filter = 'drop-shadow(0 0 4px var(--danger))';
         } else if (fuelPercentage <= 35) {
@@ -879,16 +1273,15 @@
             circleFill.style.filter = 'drop-shadow(0 0 4px var(--primary))';
         }
 
-        // ── 3. 更新里程資訊 ──
+        // 3. 更新里程資訊
         const estimatedRange = Math.round((fuelPercentage / 100) * MAX_RANGE_KM);
         document.getElementById('range-text').textContent = estimatedRange + ' km';
 
-        // ── 4. 狀態文字 ──
-        const statusEl = document.getElementById('fuel-status');
+        // 4. 狀態文字與警告橫幅
+        const statusEl  = document.getElementById('fuel-status');
         const warningEl = document.getElementById('fuel-warning');
 
         if (estimatedRange < NEXT_STATION_KM) {
-            // 危險：里程不足
             statusEl.textContent = '油量不足！';
             statusEl.style.color = 'var(--danger)';
             warningEl.style.display = 'flex';
@@ -903,17 +1296,59 @@
         }
     }
 
+    // ──────────────────────────────────────
+    // 【優化5】鎖定徽章 Tooltip 顯示（觸控裝置補強）
+    // hover 在行動裝置上不觸發，改用 click 控制
+    // ──────────────────────────────────────
+    function showBadgeHint(el) {
+        // 若已顯示則關閉，否則先關掉其他再開啟
+        const isShowing = el.classList.contains('show-hint');
+        document.querySelectorAll('.badge.locked').forEach(b => b.classList.remove('show-hint'));
+        if (!isShowing) el.classList.add('show-hint');
+    }
+
+    // 點擊外部關閉 badge hint
+    document.addEventListener('click', e => {
+        if (!e.target.closest('.badge.locked')) {
+            document.querySelectorAll('.badge.locked').forEach(b => b.classList.remove('show-hint'));
+        }
+    });
+
+    // ──────────────────────────────────────
+    // 【優化6】DEV 控制折疊切換
+    // ──────────────────────────────────────
+    function toggleDemoControls() {
+        document.getElementById('demo-controls').classList.toggle('expanded');
+    }
+
+    // ──────────────────────────────────────
+    // 【優化7】底部導航列 → 捲動至對應模組
+    // ──────────────────────────────────────
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+            // 切換 active 樣式
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+
+            // 捲動至對應 section
+            const targetId = item.dataset.target;
+            if (targetId) {
+                const section = document.getElementById(targetId);
+                if (section) {
+                    // 扣除 header 高度（sticky header 約 68px），多留 8px 視覺呼吸空間
+                    const headerHeight = document.querySelector('header').offsetHeight;
+                    const top = section.getBoundingClientRect().top
+                              + window.pageYOffset
+                              - headerHeight - 8;
+                    window.scrollTo({ top, behavior: 'smooth' });
+                }
+            }
+        });
+    });
+
     // 頁面載入時初始化儀表盤為預設 70%
     window.addEventListener('DOMContentLoaded', () => {
         updateFuelLogic(70);
-    });
-
-    // ── 底部導航列切換（視覺互動）──
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.addEventListener('click', () => {
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            item.classList.add('active');
-        });
     });
 </script>
 </body>
