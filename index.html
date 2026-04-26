@@ -4,298 +4,917 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>輪跡天涯 - 環島專屬助理</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;800&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* 基礎全域設定：採用深色模式，符合騎士戶外導航與科技感 */
+        /* ══════════════════════════════════════
+           全域設計語言：夜騎儀表板 (Night Dash)
+           核心色彩：深空黑 + 氖光青 + 警報橙
+           ══════════════════════════════════════ */
         :root {
-            --primary-color: #00ADB5;
-            --bg-dark: #222831;
-            --bg-card: #393E46;
-            --text-light: #EEEEEE;
-            --danger-color: #FF5722;
-            --warning-color: #FFC107;
+            --primary:       #00D4E0;
+            --primary-dim:   #00ADB5;
+            --primary-glow:  rgba(0, 212, 224, 0.15);
+            --primary-glow2: rgba(0, 212, 224, 0.05);
+            --danger:        #FF5722;
+            --danger-glow:   rgba(255, 87, 34, 0.3);
+            --warning:       #FFC107;
+            --warning-glow:  rgba(255, 193, 7, 0.15);
+            --success:       #4CAF50;
+
+            --bg-void:   #0D1117;
+            --bg-dark:   #161B22;
+            --bg-card:   #1C2333;
+            --bg-card2:  #21293B;
+            --border:    rgba(255,255,255,0.06);
+            --border-hi: rgba(0, 212, 224, 0.25);
+
+            --text-primary:   #F0F6FC;
+            --text-secondary: #8B949E;
+            --text-dim:       #484F58;
+
+            --radius-card: 16px;
+            --radius-pill: 50px;
         }
+
+        * { box-sizing: border-box; }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-light);
+            /* 夜騎背景：微型十字網格，模擬儀表板底紋 */
+            background-color: var(--bg-void);
+            background-image:
+                linear-gradient(var(--border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 40px 40px;
             margin: 0;
             padding: 0;
+            font-family: 'Noto Sans TC', sans-serif;
+            color: var(--text-primary);
             display: flex;
             justify-content: center;
+            min-height: 100vh;
         }
 
-        /* 模擬手機 APP 畫面寬度 */
+        /* ── APP 外殼 ── */
         .app-container {
             width: 100%;
-            max-width: 414px; /* iPhone Max 寬度 */
+            max-width: 414px;
             min-height: 100vh;
-            background-color: var(--bg-dark);
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            padding-bottom: 20px;
+            position: relative;
+            padding-bottom: 90px; /* 為底部導航留空 */
+            /* 微弱的頂部氖光暈染效果 */
+            box-shadow:
+                0 0 60px rgba(0, 212, 224, 0.04),
+                inset 0 0 60px rgba(0,0,0,0.3);
         }
 
-        /* 頂部標題列 */
+        /* ── 頂部標題列 ── */
         header {
-            background-color: var(--bg-card);
-            padding: 20px;
-            text-align: center;
-            border-bottom: 3px solid var(--primary-color);
+            background-color: rgba(22, 27, 34, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 18px 20px 14px;
+            border-bottom: 1px solid var(--border-hi);
             position: sticky;
             top: 0;
             z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-brand {
+            display: flex;
+            flex-direction: column;
         }
 
         header h1 {
             margin: 0;
-            font-size: 1.5rem;
-            letter-spacing: 2px;
-        }
-        
-        header p {
-            margin: 5px 0 0 0;
-            font-size: 0.8rem;
-            color: #AAA;
+            font-family: 'Exo 2', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: 3px;
+            background: linear-gradient(90deg, var(--primary), #7FFFD4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
         }
 
-        /* 內容區塊卡片排版 */
+        header .sub {
+            margin: 4px 0 0;
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+        }
+
+        /* 狀態指示燈 */
+        .status-dot {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.72rem;
+            color: var(--success);
+        }
+
+        .status-dot::before {
+            content: '';
+            display: block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success);
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(0.85); }
+        }
+
+        /* ── 卡片 ── */
         .module-card {
-            background-color: var(--bg-card);
-            border-radius: 12px;
-            margin: 15px;
-            padding: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-card2));
+            border: 1px solid var(--border);
+            border-radius: var(--radius-card);
+            margin: 14px 14px 0;
+            padding: 18px;
+            position: relative;
+            overflow: hidden;
+            /* 入場動畫 */
+            opacity: 0;
+            transform: translateY(16px);
+            animation: card-enter 0.5s ease forwards;
+        }
+
+        /* 卡片入場錯落動畫 */
+        .module-card:nth-child(1) { animation-delay: 0.05s; }
+        .module-card:nth-child(2) { animation-delay: 0.15s; }
+        .module-card:nth-child(3) { animation-delay: 0.25s; }
+        .module-card:nth-child(4) { animation-delay: 0.35s; }
+        .module-card:nth-child(5) { animation-delay: 0.45s; }
+        .module-card:nth-child(6) { animation-delay: 0.55s; }
+
+        @keyframes card-enter {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 卡片左側氖光邊線 */
+        .module-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 20%;
+            bottom: 20%;
+            width: 3px;
+            background: linear-gradient(180deg, transparent, var(--primary), transparent);
+            border-radius: 0 3px 3px 0;
+        }
+
+        /* 卡片右上角裝飾角落 */
+        .module-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle at top right, var(--primary-glow2), transparent 70%);
+            pointer-events: none;
         }
 
         .module-title {
-            font-size: 1.1rem;
-            margin-top: 0;
-            margin-bottom: 15px;
+            font-family: 'Exo 2', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin: 0 0 14px;
+            padding-left: 12px;
+            letter-spacing: 1px;
+            color: var(--text-primary);
             display: flex;
             align-items: center;
-            border-left: 4px solid var(--primary-color);
-            padding-left: 10px;
+            gap: 8px;
+            text-transform: uppercase;
         }
 
-        /* 模塊 1：天氣與避雨 (痛點1) */
+        .module-title .icon {
+            font-size: 1.1rem;
+        }
+
+        /* ══════════════════════════════
+           模組 1：天氣預警
+           ══════════════════════════════ */
         .weather-alert {
-            background-color: rgba(255, 193, 7, 0.1);
-            border: 1px solid var(--warning-color);
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--warning-glow), rgba(255,193,7,0.05));
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 10px;
+            padding: 12px 14px;
         }
 
-        /* 模塊 2：燃料預測進度條 (痛點2) */
-        .fuel-bar-container {
-            background-color: #555;
-            border-radius: 10px;
-            height: 20px;
-            width: 100%;
-            margin: 10px 0;
+        .weather-alert .alert-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--warning);
+            margin-bottom: 8px;
+            font-family: 'Exo 2', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        .weather-alert .alert-body {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .weather-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(0, 212, 224, 0.1);
+            border: 1px solid var(--border-hi);
+            border-radius: 20px;
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            color: var(--primary);
+            margin-top: 8px;
+        }
+
+        /* 計時倒數 */
+        .countdown-bar {
+            height: 3px;
+            background: var(--bg-void);
+            border-radius: 3px;
+            margin-top: 10px;
             overflow: hidden;
         }
 
-        .fuel-bar-fill {
-            background-color: var(--primary-color);
+        .countdown-fill {
             height: 100%;
-            width: 70%; /* 預設油量 */
-            transition: width 0.3s, background-color 0.3s;
+            width: 75%;
+            background: linear-gradient(90deg, var(--warning), #FF8C00);
+            border-radius: 3px;
+            animation: countdown 15s linear infinite;
         }
 
-        .fuel-stats {
+        @keyframes countdown {
+            from { width: 100%; }
+            to { width: 0%; }
+        }
+
+        /* ══════════════════════════════
+           模組 2：燃料預測
+           ══════════════════════════════ */
+        .fuel-gauge-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 12px;
+        }
+
+        /* 圓形儀表 */
+        .fuel-circle {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .fuel-circle svg {
+            transform: rotate(-90deg);
+        }
+
+        .fuel-circle .circle-bg {
+            fill: none;
+            stroke: var(--bg-void);
+            stroke-width: 8;
+        }
+
+        .fuel-circle .circle-fill {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-dasharray: 220;
+            stroke-dashoffset: 66; /* 70% → offset = 220 * 0.30 = 66 */
+            filter: drop-shadow(0 0 4px var(--primary));
+            transition: stroke-dashoffset 0.6s ease, stroke 0.3s;
+        }
+
+        .fuel-circle .circle-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Exo 2', sans-serif;
+        }
+
+        .fuel-circle .circle-percent {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+
+        .fuel-circle .circle-label {
+            font-size: 0.55rem;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        .fuel-info {
+            flex: 1;
+        }
+
+        .fuel-stat-row {
             display: flex;
             justify-content: space-between;
-            font-size: 0.9rem;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.8rem;
         }
 
-        .danger-text { color: var(--danger-color); font-weight: bold; }
+        .fuel-stat-row:last-child { border-bottom: none; }
 
-        /* 模塊 3：友善住宿標籤 (痛點3) */
+        .fuel-stat-label { color: var(--text-secondary); }
+        .fuel-stat-value {
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .fuel-warning-banner {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, rgba(255,87,34,0.15), rgba(255,87,34,0.05));
+            border: 1px solid rgba(255, 87, 34, 0.4);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 0.8rem;
+            color: var(--danger);
+            margin-top: 10px;
+            animation: warning-flash 1.5s ease-in-out infinite;
+        }
+
+        @keyframes warning-flash {
+            0%, 100% { border-color: rgba(255,87,34,0.4); }
+            50% { border-color: rgba(255,87,34,0.9); }
+        }
+
+        /* ══════════════════════════════
+           模組 3：住宿篩選
+           ══════════════════════════════ */
+        .accommodation-header {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
         .tag-container {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
         }
 
         .filter-tag {
-            background-color: transparent;
-            border: 1px solid var(--primary-color);
-            color: var(--primary-color);
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
+            background: transparent;
+            border: 1px solid var(--border-hi);
+            color: var(--text-secondary);
+            padding: 6px 14px;
+            border-radius: var(--radius-pill);
+            font-size: 0.75rem;
+            font-family: 'Noto Sans TC', sans-serif;
             cursor: pointer;
-            transition: 0.2s;
+            transition: all 0.2s ease;
+            letter-spacing: 0.3px;
+        }
+
+        .filter-tag:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-glow2);
         }
 
         .filter-tag.active {
-            background-color: var(--primary-color);
-            color: var(--bg-dark);
+            background: var(--primary-glow);
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: 0 0 10px rgba(0, 212, 224, 0.2);
         }
 
-        /* 模塊 4：SOS 緊急按鈕 (痛點4) */
+        /* ══════════════════════════════
+           模組 4：SOS 按鈕
+           ══════════════════════════════ */
+        .sos-card {
+            /* SOS 卡片使用特殊危險主題 */
+            background: linear-gradient(135deg, rgba(255,87,34,0.08), rgba(255,87,34,0.02));
+            border-color: rgba(255,87,34,0.2);
+        }
+
+        .sos-card::before {
+            background: linear-gradient(180deg, transparent, var(--danger), transparent);
+        }
+
+        .sos-card::after {
+            background: radial-gradient(circle at top right, rgba(255,87,34,0.08), transparent 70%);
+        }
+
+        .sos-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            line-height: 1.5;
+            padding-left: 12px;
+        }
+
+        .sos-btn-wrapper {
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* SOS 雙層脈衝光環 */
+        .sos-ring {
+            position: absolute;
+            inset: -8px;
+            border-radius: 50px;
+            border: 2px solid var(--danger);
+            opacity: 0;
+            animation: sos-ring 2.5s ease-out infinite;
+        }
+
+        .sos-ring:nth-child(2) {
+            inset: -16px;
+            animation-delay: 0.6s;
+        }
+
+        @keyframes sos-ring {
+            0% { opacity: 0.6; transform: scale(0.95); }
+            100% { opacity: 0; transform: scale(1.08); }
+        }
+
         .sos-btn {
-            background-color: var(--danger-color);
+            background: linear-gradient(135deg, #FF5722, #D84315);
             color: white;
             border: none;
-            border-radius: 50px;
-            padding: 15px;
-            width: 100%;
-            font-size: 1.2rem;
-            font-weight: bold;
+            border-radius: var(--radius-pill);
+            padding: 16px 40px;
+            font-family: 'Exo 2', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 800;
+            letter-spacing: 3px;
             text-transform: uppercase;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(255, 87, 34, 0.4);
-        }
-        
-        .sos-btn:active {
-            transform: scale(0.98);
+            position: relative;
+            box-shadow:
+                0 4px 20px rgba(255, 87, 34, 0.45),
+                0 0 40px rgba(255, 87, 34, 0.15),
+                inset 0 1px 0 rgba(255,255,255,0.15);
+            transition: all 0.2s ease;
+            z-index: 1;
         }
 
-        /* 模塊 5：成就系統 (痛點5) */
+        .sos-btn:hover {
+            transform: translateY(-2px);
+            box-shadow:
+                0 8px 28px rgba(255, 87, 34, 0.55),
+                0 0 60px rgba(255, 87, 34, 0.2),
+                inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+
+        .sos-btn:active {
+            transform: scale(0.97) translateY(0);
+        }
+
+        /* ══════════════════════════════
+           模組 5：成就系統
+           ══════════════════════════════ */
         .achievement-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
         }
-        
+
         .badge {
-            background-color: #2a2f36;
+            background: linear-gradient(135deg, rgba(0,212,224,0.05), rgba(0,0,0,0.2));
+            border: 1px solid var(--border-hi);
+            border-radius: 12px;
             text-align: center;
-            padding: 15px 5px;
-            border-radius: 8px;
-            border: 1px dashed #555;
+            padding: 16px 8px;
+            transition: all 0.25s ease;
+            cursor: default;
+            position: relative;
+            overflow: hidden;
         }
 
-        /* 互動用滑桿 (僅供展示概念用) */
+        .badge::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 0%, var(--primary-glow2), transparent 70%);
+        }
+
+        .badge:hover {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, var(--primary-glow), rgba(0,0,0,0.2));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 212, 224, 0.1);
+        }
+
+        .badge-icon {
+            font-size: 2rem;
+            line-height: 1;
+            filter: drop-shadow(0 0 6px rgba(0,212,224,0.4));
+        }
+
+        .badge-name {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        .badge-value {
+            font-family: 'Exo 2', sans-serif;
+            font-size: 0.72rem;
+            color: var(--primary);
+            margin-top: 3px;
+            letter-spacing: 0.5px;
+        }
+
+        /* 鎖定狀態徽章 */
+        .badge.locked {
+            opacity: 0.4;
+            filter: grayscale(1);
+        }
+
+        .badge.locked:hover {
+            transform: none;
+            border-color: var(--border);
+            background: linear-gradient(135deg, rgba(0,212,224,0.05), rgba(0,0,0,0.2));
+        }
+
+        /* ══════════════════════════════
+           展示控制區
+           ══════════════════════════════ */
         .demo-controls {
-            margin-top: 30px;
-            padding: 15px;
-            border-top: 1px solid #555;
-            font-size: 0.8rem;
-            color: #AAA;
+            margin: 14px 14px 0;
+            padding: 14px;
+            background: var(--bg-card);
+            border: 1px dashed var(--text-dim);
+            border-radius: var(--radius-card);
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        .demo-controls label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+
+        .demo-controls input[type="range"] {
+            width: 100%;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        /* ══════════════════════════════
+           底部導航列 (固定)
+           ══════════════════════════════ */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 414px;
+            background: rgba(22, 27, 34, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-hi);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 0 14px;
+            z-index: 200;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 4px 12px;
+            border-radius: 10px;
+        }
+
+        .nav-item.active .nav-icon {
+            color: var(--primary);
+            filter: drop-shadow(0 0 6px var(--primary));
+        }
+
+        .nav-item.active .nav-label { color: var(--primary); }
+
+        .nav-icon {
+            font-size: 1.3rem;
+            color: var(--text-dim);
+            transition: 0.2s;
+        }
+
+        .nav-label {
+            font-size: 0.6rem;
+            color: var(--text-dim);
+            letter-spacing: 0.5px;
+        }
+
+        /* ══════════════════════════════
+           頁腳
+           ══════════════════════════════ */
+        footer {
+            text-align: center;
+            padding: 16px 20px;
+            font-size: 0.68rem;
+            color: var(--text-dim);
+            border-top: 1px solid var(--border);
+            line-height: 1.8;
+            margin: 14px 14px 0;
         }
     </style>
 </head>
 <body>
-
 <div class="app-container">
+
+    <!-- ── 標題列 ── -->
     <header>
-        <h1>輪跡天涯</h1>
-        <p>目前綁定車輛：KYMCO 125cc 大地名流</p>
+        <div class="header-brand">
+            <h1>輪跡天涯</h1>
+            <span class="sub">KYMCO 125cc 大地名流　｜　南迴公路段</span>
+        </div>
+        <div class="status-dot">定位中</div>
     </header>
 
+    <!-- ── 模組 1：天氣預警 ── -->
     <div class="module-card">
-        <h2 class="module-title">🌤️ 即時路段天氣預警</h2>
+        <h2 class="module-title"><span class="icon">🌤️</span>路段天氣預警</h2>
         <div class="weather-alert">
-            <strong>⚠️ 前方路況注意</strong><br>
-            預計 15 分鐘後（台9線 420K 處）有陣雨。<br>
-            距離最近避雨點：全家便利商店 (2.5 km)
+            <div class="alert-header">⚠ 前方雨勢警告</div>
+            <div class="alert-body">
+                預計 <strong style="color: var(--warning)">15 分鐘後</strong>，台9線 420K 處將有陣雨。<br>
+                最近避雨點：全家便利商店 (2.5 km)
+            </div>
+            <span class="weather-badge">🏪 最近避雨點 2.5 km →</span>
+            <div class="countdown-bar">
+                <div class="countdown-fill"></div>
+            </div>
         </div>
     </div>
 
+    <!-- ── 模組 2：燃料預測 ── -->
     <div class="module-card">
-        <h2 class="module-title">⛽ 燃料智慧預測</h2>
-        <p style="margin:0; font-size:0.9rem;">距離下一站加油站：<strong id="next-station-dist">35</strong> km</p>
-        
-        <div class="fuel-bar-container">
-            <div class="fuel-bar-fill" id="fuel-level"></div>
+        <h2 class="module-title"><span class="icon">⛽</span>燃料智慧預測</h2>
+        <div class="fuel-gauge-wrapper">
+            <!-- 圓形儀表盤 -->
+            <div class="fuel-circle">
+                <svg width="88" height="88" viewBox="0 0 88 88">
+                    <circle class="circle-bg" cx="44" cy="44" r="35"/>
+                    <circle class="circle-fill" id="circle-fill" cx="44" cy="44" r="35"/>
+                </svg>
+                <div class="circle-text">
+                    <span class="circle-percent" id="fuel-percent-num">70</span>
+                    <span class="circle-label">油量%</span>
+                </div>
+            </div>
+            <!-- 統計資訊 -->
+            <div class="fuel-info">
+                <div class="fuel-stat-row">
+                    <span class="fuel-stat-label">下一加油站</span>
+                    <span class="fuel-stat-value" id="next-station-dist">35 km</span>
+                </div>
+                <div class="fuel-stat-row">
+                    <span class="fuel-stat-label">預估可行駛</span>
+                    <span class="fuel-stat-value" id="range-text">140 km</span>
+                </div>
+                <div class="fuel-stat-row">
+                    <span class="fuel-stat-label">目前狀態</span>
+                    <span class="fuel-stat-value" id="fuel-status" style="color: var(--success)">充足</span>
+                </div>
+            </div>
         </div>
-        
-        <div class="fuel-stats">
-            <span id="fuel-percent-text">剩餘油量：70%</span>
-            <span id="range-text">預估可行駛：140 km</span>
+        <div class="fuel-warning-banner" id="fuel-warning">
+            <span>⚠</span> 預估里程不足！請立即掉頭或呼叫道路救援
         </div>
-        <p id="fuel-warning" class="danger-text" style="display: none; margin-top: 10px;">
-            ⚠️ 警告：預估里程不足以抵達下一站，請立即掉頭或呼叫道路救援！
-        </p>
     </div>
 
+    <!-- ── 模組 3：住宿篩選 ── -->
     <div class="module-card">
-        <h2 class="module-title">🏨 友善住宿雷達</h2>
-        <p style="font-size: 0.8rem; color: #AAA;">篩選周邊認證之機車友善民宿</p>
+        <h2 class="module-title"><span class="icon">🏨</span>友善住宿雷達</h2>
+        <div class="accommodation-header">
+            📍 周邊 10 km 內共找到 <strong style="color: var(--primary)">8</strong> 間認證機車友善住宿
+        </div>
         <div class="tag-container">
-            <button class="filter-tag active" onclick="toggleTag(this)">專屬室內停車</button>
-            <button class="filter-tag" onclick="toggleTag(this)">洗車區提供</button>
-            <button class="filter-tag" onclick="toggleTag(this)">防雨遮蓋</button>
+            <button class="filter-tag active" onclick="toggleTag(this)">🔒 室內停車</button>
+            <button class="filter-tag" onclick="toggleTag(this)">🚿 洗車區</button>
+            <button class="filter-tag" onclick="toggleTag(this)">☂️ 防雨遮蓋</button>
+            <button class="filter-tag" onclick="toggleTag(this)">🔧 工具借用</button>
         </div>
     </div>
 
-    <div class="module-card" style="text-align: center;">
-        <h2 class="module-title">🚑 體力透支與緊急救援</h2>
-        <p style="font-size: 0.8rem; color: #AAA; margin-bottom: 15px;">將傳送您的 GPS 座標至最近醫療與機車行</p>
-        <button class="sos-btn" onclick="triggerSOS()">SOS 一鍵呼叫</button>
+    <!-- ── 模組 4：SOS 緊急救援 ── -->
+    <div class="module-card sos-card">
+        <h2 class="module-title"><span class="icon">🚑</span>緊急救援</h2>
+        <p class="sos-subtitle">
+            一鍵傳送 GPS 座標至最近醫療院所與機車行<br>
+            <span style="color: var(--danger); font-weight: 500">長按 2 秒啟動 · 避免誤觸</span>
+        </p>
+        <div class="sos-btn-wrapper">
+            <div class="sos-ring"></div>
+            <div class="sos-ring"></div>
+            <button class="sos-btn" id="sos-btn" onmousedown="startSOS()" onmouseup="cancelSOS()" ontouchstart="startSOS()" ontouchend="cancelSOS()">
+                SOS 救援
+            </button>
+        </div>
     </div>
 
+    <!-- ── 模組 5：成就系統 ── -->
     <div class="module-card">
-        <h2 class="module-title">📖 旅程成就認證</h2>
+        <h2 class="module-title"><span class="icon">🎖️</span>旅程成就認證</h2>
         <div class="achievement-grid">
             <div class="badge">
-                <div style="font-size: 1.5rem;">🏅</div>
-                <div style="margin-top: 5px;">壽卡征服者</div>
+                <div class="badge-icon">🏅</div>
+                <div class="badge-name">壽卡征服者</div>
+                <div class="badge-value">已解鎖</div>
             </div>
             <div class="badge">
-                <div style="font-size: 1.5rem;">🗺️</div>
-                <div style="margin-top: 5px;">109,72 km<br>結業徽章</div>
+                <div class="badge-icon">🗺️</div>
+                <div class="badge-name">結業徽章</div>
+                <div class="badge-value">1,097.2 km</div>
+            </div>
+            <div class="badge locked">
+                <div class="badge-icon">🏔️</div>
+                <div class="badge-name">合歡山破霧</div>
+                <div class="badge-value">待解鎖</div>
+            </div>
+            <div class="badge locked">
+                <div class="badge-icon">🌊</div>
+                <div class="badge-name">墾丁落日騎士</div>
+                <div class="badge-value">待解鎖</div>
             </div>
         </div>
     </div>
 
+    <!-- ── 展示控制區 ── -->
     <div class="demo-controls">
-        <p>👨‍💻 展示控制區 (模擬油耗消耗)：</p>
-        <label for="fuel-slider">目前油量：</label>
-        <input type="range" id="fuel-slider" min="0" max="100" value="70" oninput="updateFuelLogic(this.value)" style="width: 100%;">
+        <p style="margin: 0 0 8px; font-family: 'Exo 2', sans-serif; letter-spacing: 1px;">DEV · 模擬油量控制</p>
+        <label for="fuel-slider">目前油量（拖曳模擬油耗）：</label>
+        <input type="range" id="fuel-slider" min="0" max="100" value="70"
+               oninput="updateFuelLogic(this.value)">
     </div>
+
+    <!-- 頁腳 -->
+    <footer>
+        © 2026 楊明杰 (Yang,Ming-Jie). All Rights Reserved.<br>
+        資管系 2411331045 · 獨立開發專題
+    </footer>
+
+    <!-- ── 底部導航列 ── -->
+    <nav class="bottom-nav">
+        <div class="nav-item active">
+            <div class="nav-icon">🏠</div>
+            <div class="nav-label">總覽</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">🗺️</div>
+            <div class="nav-label">地圖</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">⛽</div>
+            <div class="nav-label">燃料</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">🏨</div>
+            <div class="nav-label">住宿</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">👤</div>
+            <div class="nav-label">我的</div>
+        </div>
+    </nav>
 
 </div>
 
 <script>
-    // 嚴格依照附檔邏輯實作的 JavaScript
+    /* ══════════════════════════════════════
+       嚴格依照原附檔邏輯實作，並新增互動優化
+       ══════════════════════════════════════ */
 
-    // --- 住宿標籤切換邏輯 ---
+    // ── 住宿標籤切換 ──
     function toggleTag(btn) {
         btn.classList.toggle('active');
     }
 
-    // --- SOS 按鈕邏輯 ---
-    function triggerSOS() {
-        // 模擬取得經緯度與呼叫救援的行為
-        alert("🚨 已啟動緊急救援程序！\n\n系統已定位您的位置：\n經度 120.8°E, 緯度 22.2°N (南迴公路段)\n\n已通報最近的：\n1. 大武鄉衛生所\n2. 達仁機車行\n\n請保持冷靜並移動至安全路肩等待。");
+    // ── SOS 長按邏輯（原版改良：防止誤觸）──
+    let sosTimer = null;
+    let sosProgress = 0;
+
+    function startSOS() {
+        const btn = document.getElementById('sos-btn');
+        btn.textContent = '按住中...';
+        sosTimer = setTimeout(() => {
+            triggerSOS();
+            btn.textContent = 'SOS 救援';
+        }, 2000); // 長按 2 秒後觸發
     }
 
-    // --- 燃料智慧計算邏輯 ---
-    // 假設 125cc 大地名流 滿油可行駛 200 km
-    const MAX_RANGE_KM = 200; 
-    const NEXT_STATION_KM = 35; // 假設距離下一站固定為 35 公里
+    function cancelSOS() {
+        clearTimeout(sosTimer);
+        const btn = document.getElementById('sos-btn');
+        btn.textContent = 'SOS 救援';
+    }
+
+    function triggerSOS() {
+        alert("🚨 緊急救援已啟動\n\n📍 定位座標：120.8°E, 22.2°N（南迴公路段）\n\n已通報：\n→ 大武鄉衛生所\n→ 達仁機車行\n\n請保持冷靜，移動至安全路肩等待。");
+    }
+
+    // ── 燃料邏輯 (原版核心保留，新增圓形儀表盤同步) ──
+    const MAX_RANGE_KM = 200;   // 125cc 大地名流 滿油可行駛距離
+    const NEXT_STATION_KM = 35; // 距下一加油站距離（固定示範值）
+    const CIRCUMFERENCE = 2 * Math.PI * 35; // r=35 的圓周長 ≈ 220
 
     function updateFuelLogic(fuelPercentage) {
-        const fuelBar = document.getElementById('fuel-level');
-        const rangeText = document.getElementById('range-text');
-        const percentText = document.getElementById('fuel-percent-text');
-        const warning = document.getElementById('fuel-warning');
+        fuelPercentage = parseInt(fuelPercentage);
 
-        // 更新進度條 UI
-        fuelBar.style.width = fuelPercentage + '%';
-        percentText.innerText = '剩餘油量：' + fuelPercentage + '%';
+        // ── 1. 更新圓形儀表盤 ──
+        const circleFill = document.getElementById('circle-fill');
+        const percentNum  = document.getElementById('fuel-percent-num');
 
-        // 依比例計算預估可行駛里程
-        const estimatedRange = Math.round((fuelPercentage / 100) * MAX_RANGE_KM);
-        rangeText.innerText = '預估可行駛：' + estimatedRange + ' km';
+        // strokeDashoffset：0 = 全滿，CIRCUMFERENCE = 全空
+        const offset = CIRCUMFERENCE * (1 - fuelPercentage / 100);
+        circleFill.style.strokeDasharray  = CIRCUMFERENCE;
+        circleFill.style.strokeDashoffset = offset;
+        percentNum.textContent = fuelPercentage;
 
-        // 判斷邏輯：若可行駛距離小於下一站距離，觸發警報變色
-        if (estimatedRange < NEXT_STATION_KM) {
-            fuelBar.style.backgroundColor = 'var(--danger-color)';
-            rangeText.classList.add('danger-text');
-            warning.style.display = 'block';
+        // ── 2. 依油量變更儀表顏色 ──
+        if (fuelPercentage <= 17.5) { // 17.5% = 可行駛 35km 臨界值
+            circleFill.style.stroke = 'var(--danger)';
+            circleFill.style.filter = 'drop-shadow(0 0 4px var(--danger))';
+        } else if (fuelPercentage <= 35) {
+            circleFill.style.stroke = 'var(--warning)';
+            circleFill.style.filter = 'drop-shadow(0 0 4px var(--warning))';
         } else {
-            // 恢復正常顏色
-            fuelBar.style.backgroundColor = 'var(--primary-color)';
-            rangeText.classList.remove('danger-text');
-            warning.style.display = 'none';
+            circleFill.style.stroke = 'var(--primary)';
+            circleFill.style.filter = 'drop-shadow(0 0 4px var(--primary))';
+        }
+
+        // ── 3. 更新里程資訊 ──
+        const estimatedRange = Math.round((fuelPercentage / 100) * MAX_RANGE_KM);
+        document.getElementById('range-text').textContent = estimatedRange + ' km';
+
+        // ── 4. 狀態文字 ──
+        const statusEl = document.getElementById('fuel-status');
+        const warningEl = document.getElementById('fuel-warning');
+
+        if (estimatedRange < NEXT_STATION_KM) {
+            // 危險：里程不足
+            statusEl.textContent = '油量不足！';
+            statusEl.style.color = 'var(--danger)';
+            warningEl.style.display = 'flex';
+        } else if (fuelPercentage <= 35) {
+            statusEl.textContent = '建議補充';
+            statusEl.style.color = 'var(--warning)';
+            warningEl.style.display = 'none';
+        } else {
+            statusEl.textContent = '充足';
+            statusEl.style.color = 'var(--success)';
+            warningEl.style.display = 'none';
         }
     }
-</script>
 
+    // 頁面載入時初始化儀表盤為預設 70%
+    window.addEventListener('DOMContentLoaded', () => {
+        updateFuelLogic(70);
+    });
+
+    // ── 底部導航列切換（視覺互動）──
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+        });
+    });
+</script>
 </body>
 </html>
