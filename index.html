@@ -148,6 +148,8 @@
         .module-card:nth-child(4) { animation-delay: 0.35s; }
         .module-card:nth-child(5) { animation-delay: 0.45s; }
         .module-card:nth-child(6) { animation-delay: 0.55s; }
+        .module-card:nth-child(7) { animation-delay: 0.65s; } /* 影片靈感模組 */
+        .module-card:nth-child(8) { animation-delay: 0.75s; } /* 社群模組 */
 
         @keyframes card-enter {
             to { opacity: 1; transform: translateY(0); }
@@ -893,6 +895,709 @@
             margin: 14px 14px 0;
         }
 
+        /* ══════════════════════════════
+           模組 6：旅遊靈感影片
+           ══════════════════════════════ */
+
+        /* ── 頻道分類 Tab ── */
+        .video-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .video-tab {
+            background: transparent;
+            border: 1px solid var(--border-hi);
+            color: var(--text-secondary);
+            padding: 5px 13px;
+            border-radius: var(--radius-pill);
+            font-size: 0.73rem;
+            font-family: 'Noto Sans TC', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .video-tab:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-glow2);
+        }
+
+        .video-tab.active {
+            background: var(--primary-glow);
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: 0 0 10px rgba(0,212,224,0.2);
+        }
+
+        /* ── 橫向捲動影片列 ── */
+        .video-scroll-wrapper {
+            position: relative;
+        }
+
+        .video-scroll {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 6px;
+            scrollbar-width: none; /* Firefox 隱藏捲軸 */
+        }
+        .video-scroll::-webkit-scrollbar { display: none; }
+
+        /* ── 影片卡片 ── */
+        .video-card {
+            flex-shrink: 0;
+            width: 210px;
+            scroll-snap-align: start;
+            background: var(--bg-void);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+            position: relative;
+        }
+
+        .video-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--border-hi);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+
+        /* 縮圖容器 */
+        .video-thumb {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #0D1117;
+            overflow: hidden;
+        }
+
+        .video-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.35s ease;
+        }
+
+        .video-card:hover .video-thumb img {
+            transform: scale(1.05);
+        }
+
+        /* 播放按鈕覆蓋層 */
+        .video-play-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.25);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .video-card:hover .video-play-overlay { opacity: 1; }
+
+        .play-btn-circle {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: rgba(255,0,0,0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 12px rgba(255,0,0,0.5);
+            transition: transform 0.15s ease;
+        }
+
+        .video-card:hover .play-btn-circle { transform: scale(1.1); }
+
+        .play-icon {
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 7px 0 7px 14px;
+            border-color: transparent transparent transparent white;
+            margin-left: 3px;
+        }
+
+        /* 影片時長 Badge */
+        .video-duration {
+            position: absolute;
+            bottom: 5px;
+            right: 6px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            font-size: 0.62rem;
+            font-family: 'Exo 2', sans-serif;
+            padding: 2px 5px;
+            border-radius: 3px;
+            letter-spacing: 0.5px;
+        }
+
+        /* 影片頻道 Badge（左上） */
+        .video-channel-badge {
+            position: absolute;
+            top: 5px;
+            left: 6px;
+            font-size: 0.6rem;
+            padding: 2px 7px;
+            border-radius: 3px;
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-nabad   { background: #1a6b2e; color: #7FFFD4; } /* 旅圖奶爸 */
+        .badge-now     { background: #6b1a1a; color: #FFB3B3; } /* 鬧著玩 */
+        .badge-other   { background: #1a3a6b; color: #ADD8E6; } /* 其他 */
+
+        /* 影片資訊區 */
+        .video-info {
+            padding: 10px 10px 12px;
+        }
+
+        .video-title {
+            font-size: 0.78rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: 6px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .video-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .video-channel-name {
+            font-size: 0.67rem;
+            color: var(--text-secondary);
+        }
+
+        .video-views {
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            font-family: 'Exo 2', sans-serif;
+        }
+
+        /* ── 已選影片播放展示區 ── */
+        .video-preview-panel {
+            display: none; /* 預設隱藏，點選影片卡後顯示 */
+            margin-top: 14px;
+            background: var(--bg-void);
+            border: 1px solid var(--border-hi);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .video-preview-panel.visible { display: block; animation: card-enter 0.3s ease forwards; }
+
+        /* 16:9 iframe 容器（保持比例） */
+        .video-embed-wrap {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+        }
+
+        .video-embed-wrap iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .video-preview-footer {
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .video-preview-title {
+            font-size: 0.78rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            flex: 1;
+            margin-right: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .video-open-yt {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: #FF0000;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 5px 10px;
+            font-size: 0.68rem;
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            text-decoration: none;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+
+        .video-open-yt:hover { background: #CC0000; }
+
+        /* ── 橫向捲動方向指示箭頭 ── */
+        .scroll-hint {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            margin-top: 8px;
+            justify-content: flex-end;
+        }
+
+        /* ══════════════════════════════
+           模組 7：社群 & 互助平台
+           ══════════════════════════════ */
+
+        /* ── 社群卡頂部：雷達 + 騎士列表並排 ── */
+        .community-top {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            margin-bottom: 14px;
+        }
+
+        /* ── 雷達視覺化 ── */
+        .radar-wrap {
+            position: relative;
+            width: 118px;
+            height: 118px;
+            flex-shrink: 0;
+        }
+
+        .radar-svg { width: 100%; height: 100%; }
+
+        /* 旋轉掃描層（conic gradient + CSS 動畫） */
+        .radar-sweep-layer {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            /* 扇形掃描光（60° 弧扇） */
+            background: conic-gradient(
+                from 0deg,
+                rgba(0, 212, 224, 0.35) 0deg,
+                rgba(0, 212, 224, 0.12) 40deg,
+                transparent 70deg,
+                transparent 360deg
+            );
+            animation: radar-rotate 3s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes radar-rotate {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
+        }
+
+        /* 雷達標題標籤 */
+        .radar-label {
+            position: absolute;
+            bottom: -18px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.62rem;
+            color: var(--text-dim);
+            font-family: 'Exo 2', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        /* ── 附近騎士列表 ── */
+        .rider-list {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .rider-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 10px;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .rider-item:hover {
+            border-color: var(--border-hi);
+            background: var(--primary-glow2);
+        }
+
+        /* 騎士頭像（彩色字母） */
+        .rider-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 800;
+            font-size: 0.85rem;
+            color: white;
+            flex-shrink: 0;
+            letter-spacing: 0;
+        }
+
+        .rider-info { flex: 1; min-width: 0; }
+
+        .rider-name {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .rider-origin {
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            font-weight: 400;
+            margin-left: 4px;
+        }
+
+        .rider-status {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.68rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        /* 狀態小圓點 */
+        .status-sm {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .status-sm.riding  { background: var(--success);  box-shadow: 0 0 4px var(--success); }
+        .status-sm.resting { background: var(--warning);  box-shadow: 0 0 4px var(--warning); }
+        .status-sm.seeking { background: var(--danger);   box-shadow: 0 0 4px var(--danger); }
+
+        .rider-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+
+        .rider-dist {
+            font-family: 'Exo 2', sans-serif;
+            font-size: 0.68rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* 揮手按鈕 */
+        .wave-btn {
+            background: transparent;
+            border: 1px solid var(--border-hi);
+            border-radius: 8px;
+            padding: 3px 7px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            line-height: 1;
+        }
+
+        .wave-btn:hover {
+            background: var(--primary-glow);
+            border-color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        /* 揮手觸發動畫 */
+        .wave-btn.waving {
+            animation: wave-shake 0.5s ease;
+        }
+
+        @keyframes wave-shake {
+            0%,100% { transform: rotate(0deg) scale(1); }
+            25%      { transform: rotate(20deg) scale(1.2); }
+            75%      { transform: rotate(-15deg) scale(1.1); }
+        }
+
+        /* ── 分隔線 ── */
+        .community-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 14px 0;
+        }
+
+        /* ── 即時動態牆 ── */
+        .feed-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .feed-title {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-family: 'Exo 2', sans-serif;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .feed-live-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 6px var(--success);
+            animation: pulse-dot 1.5s ease-in-out infinite;
+        }
+
+        /* 動態牆容器（最多顯示 3 則，可捲動） */
+        .community-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 260px;
+            overflow-y: auto;
+            /* 自訂捲軸 */
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-hi) transparent;
+        }
+
+        .community-feed::-webkit-scrollbar { width: 3px; }
+        .community-feed::-webkit-scrollbar-track { background: transparent; }
+        .community-feed::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 3px; }
+
+        /* 單則動態 */
+        .feed-item {
+            display: flex;
+            gap: 10px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 12px;
+            /* 新貼文入場動畫 */
+            animation: feed-enter 0.35s ease;
+        }
+
+        @keyframes feed-enter {
+            from { opacity: 0; transform: translateY(-8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .feed-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 800;
+            font-size: 0.75rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .feed-body { flex: 1; min-width: 0; }
+
+        .feed-meta {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .feed-meta span {
+            font-weight: 400;
+            color: var(--text-dim);
+            margin-left: 4px;
+        }
+
+        .feed-content {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 6px;
+        }
+
+        .feed-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .feed-like {
+            font-size: 0.68rem;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: color 0.2s;
+            user-select: none;
+        }
+
+        .feed-like:hover { color: var(--primary); }
+        .feed-like.liked { color: var(--primary); }
+
+        /* ── 發布動態 Composer ── */
+        .post-composer {
+            margin-top: 12px;
+            background: rgba(0,212,224,0.03);
+            border: 1px solid var(--border-hi);
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        .composer-row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .composer-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-dim), #005F73);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 800;
+            font-size: 0.72rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        /* 輸入框 */
+        #post-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-family: 'Noto Sans TC', sans-serif;
+            font-size: 0.8rem;
+            resize: none;
+            min-height: 36px;
+            line-height: 1.5;
+            padding-top: 6px;
+        }
+
+        #post-input::placeholder { color: var(--text-dim); }
+
+        /* 快速路況標籤 */
+        .quick-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .quick-tag-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 4px 10px;
+            border-radius: var(--radius-pill);
+            font-size: 0.68rem;
+            font-family: 'Noto Sans TC', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .quick-tag-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-glow2);
+        }
+
+        /* 發布按鈕 */
+        .post-submit-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+
+        .post-btn {
+            background: linear-gradient(135deg, var(--primary-dim), #005F73);
+            color: white;
+            border: none;
+            border-radius: var(--radius-pill);
+            padding: 8px 20px;
+            font-family: 'Exo 2', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .post-btn:hover {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dim));
+            box-shadow: 0 0 16px rgba(0, 212, 224, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .post-btn:active { transform: scale(0.97); }
+
+        /* ── Toast 通知（揮手成功）── */
+        .toast {
+            position: fixed;
+            bottom: 100px; /* 浮在底部導航上方 */
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(28, 35, 51, 0.95);
+            border: 1px solid var(--border-hi);
+            border-radius: var(--radius-pill);
+            padding: 10px 20px;
+            font-size: 0.8rem;
+            color: var(--text-primary);
+            white-space: nowrap;
+            z-index: 500;
+            opacity: 0;
+            pointer-events: none;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
         /* ── Scroll 行為 ── */
         html { scroll-behavior: smooth; }
     </style>
@@ -1036,6 +1741,331 @@
         </div>
     </div>
 
+    <!-- ── 模組 6：旅遊靈感影片 ── -->
+    <div class="module-card" id="section-videos">
+        <h2 class="module-title"><span class="icon">▶️</span>出發前靈感補充站</h2>
+
+        <!-- 頻道分類 Tabs -->
+        <div class="video-tabs">
+            <button class="video-tab active" data-channel="all"   onclick="switchVideoTab(this)">🎬 全部</button>
+            <button class="video-tab"        data-channel="nabad" onclick="switchVideoTab(this)">🛵 旅圖奶爸</button>
+            <button class="video-tab"        data-channel="now"   onclick="switchVideoTab(this)">🎉 鬧著玩</button>
+            <button class="video-tab"        data-channel="other" onclick="switchVideoTab(this)">🌏 其他創作者</button>
+        </div>
+
+        <!-- 橫向捲動影片列 -->
+        <div class="video-scroll-wrapper">
+            <div class="video-scroll" id="video-scroll">
+
+                <!-- ── 旅圖奶爸 影片 ── -->
+                <!-- 縮圖透過 YouTube 標準縮圖 API 取得，格式：img.youtube.com/vi/{VIDEO_ID}/mqdefault.jpg -->
+                <div class="video-card" data-channel="nabad"
+                     data-id="xX1T4WM_rVQ"
+                     data-title="來台東玩之前一定要知道的細節！奶爸推薦十大景點"
+                     data-channel-name="旅圖奶爸"
+                     onclick="openVideoPreview(this)">
+                    <div class="video-thumb">
+                        <img src="https://img.youtube.com/vi/xX1T4WM_rVQ/mqdefault.jpg"
+                             alt="來台東玩之前一定要知道的細節" loading="lazy"
+                             onerror="this.src='https://img.youtube.com/vi/xX1T4WM_rVQ/default.jpg'">
+                        <div class="video-play-overlay"><div class="play-btn-circle"><div class="play-icon"></div></div></div>
+                        <span class="video-channel-badge badge-nabad">旅圖奶爸</span>
+                        <span class="video-duration">12:34</span>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">來台東玩之前一定要知道的細節！奶爸推薦十大景點</div>
+                        <div class="video-meta">
+                            <span class="video-channel-name">旅圖奶爸</span>
+                            <span class="video-views">9.2萬次觀看</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="video-card" data-channel="nabad"
+                     data-id="n126hsZQABg"
+                     data-title="環半島EP.1 | 花蓮0403地震二週年 穿越中橫太魯閣 東進武嶺全紀錄"
+                     data-channel-name="旅圖奶爸"
+                     onclick="openVideoPreview(this)">
+                    <div class="video-thumb">
+                        <img src="https://img.youtube.com/vi/n126hsZQABg/mqdefault.jpg"
+                             alt="環半島EP.1 穿越中橫太魯閣" loading="lazy"
+                             onerror="this.src='https://img.youtube.com/vi/n126hsZQABg/default.jpg'">
+                        <div class="video-play-overlay"><div class="play-btn-circle"><div class="play-icon"></div></div></div>
+                        <span class="video-channel-badge badge-nabad">旅圖奶爸</span>
+                        <span class="video-duration">24:17</span>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">環半島EP.1｜穿越中橫太魯閣 東進武嶺全紀錄</div>
+                        <div class="video-meta">
+                            <span class="video-channel-name">旅圖奶爸</span>
+                            <span class="video-views">3週前</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── 鬧著玩 影片 ── -->
+                <!-- 鬧著玩頻道以美食旅遊為主，點進去到 YouTube 頻道頁面搜尋相關影片 -->
+                <div class="video-card" data-channel="now"
+                     data-id="UCO4GmpiTno-1VGikDLxUStQ"
+                     data-title="鬧著玩｜台灣美食旅遊頻道（點此前往頻道）"
+                     data-channel-name="鬧著玩娛樂"
+                     data-is-channel="true"
+                     onclick="openVideoPreview(this)">
+                    <div class="video-thumb" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#2a0a0a,#1a0505);min-height:118px;">
+                        <div style="text-align:center;">
+                            <div style="font-size:2.5rem;margin-bottom:6px;">🎉</div>
+                            <div style="font-size:0.72rem;color:var(--text-secondary);">鬧著玩娛樂</div>
+                            <div style="font-size:0.62rem;color:var(--text-dim);margin-top:2px;">台灣美食旅遊</div>
+                        </div>
+                        <div class="video-play-overlay"><div class="play-btn-circle"><div class="play-icon"></div></div></div>
+                        <span class="video-channel-badge badge-now">鬧著玩</span>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">鬧著玩娛樂｜台灣各地美食 × 旅遊全紀錄</div>
+                        <div class="video-meta">
+                            <span class="video-channel-name">鬧著玩娛樂</span>
+                            <span class="video-views">前往頻道</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── 其他創作者 ── -->
+                <div class="video-card" data-channel="other"
+                     data-id="bwhjlxGeLaw"
+                     data-title="70歲環島！年紀不是阻礙，夢想永不停止！｜機車環島"
+                     data-channel-name="機車環島 Vlog"
+                     onclick="openVideoPreview(this)">
+                    <div class="video-thumb">
+                        <img src="https://img.youtube.com/vi/bwhjlxGeLaw/mqdefault.jpg"
+                             alt="70歲環島" loading="lazy"
+                             onerror="this.src='https://img.youtube.com/vi/bwhjlxGeLaw/default.jpg'">
+                        <div class="video-play-overlay"><div class="play-btn-circle"><div class="play-icon"></div></div></div>
+                        <span class="video-channel-badge badge-other">感人故事</span>
+                        <span class="video-duration">15:02</span>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">70歲環島！年紀不是阻礙，夢想永不停止！</div>
+                        <div class="video-meta">
+                            <span class="video-channel-name">機車環島 Vlog</span>
+                            <span class="video-views">112萬次觀看</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="video-card" data-channel="other"
+                     data-id="grULFbCbAbk"
+                     data-title="機車環島20次！白牌機車必看路線 ft. insta360"
+                     data-channel-name="愛做夢的大叔"
+                     onclick="openVideoPreview(this)">
+                    <div class="video-thumb">
+                        <img src="https://img.youtube.com/vi/grULFbCbAbk/mqdefault.jpg"
+                             alt="機車環島必看路線" loading="lazy"
+                             onerror="this.src='https://img.youtube.com/vi/grULFbCbAbk/default.jpg'">
+                        <div class="video-play-overlay"><div class="play-btn-circle"><div class="play-icon"></div></div></div>
+                        <span class="video-channel-badge badge-other">路線攻略</span>
+                        <span class="video-duration">21:08</span>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">【機車環島20】白牌機車環島必看路線！</div>
+                        <div class="video-meta">
+                            <span class="video-channel-name">愛做夢的大叔</span>
+                            <span class="video-views">18.3萬次觀看</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="video-card" data-channel="other"
+                     data-id="TXCbwB3YDkY"
+                     data-title="【機車環島】一輩子一定要去過一次的旅行｜Loot2魯特"
+                     data-channel-name="Loot2魯特"
+                     onclick="openVideoPreview(this)">
+                    <div class="video-thumb">
+                        <img src="https://img.youtube.com/vi/TXCbwB3YDkY/mqdefault.jpg"
+                             alt="一輩子一定要去過一次的旅行" loading="lazy"
+                             onerror="this.src='https://img.youtube.com/vi/TXCbwB3YDkY/default.jpg'">
+                        <div class="video-play-overlay"><div class="play-btn-circle"><div class="play-icon"></div></div></div>
+                        <span class="video-channel-badge badge-other">環島 Vlog</span>
+                        <span class="video-duration">10:51</span>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">環島會上癮，一輩子一定要去過一次的旅行</div>
+                        <div class="video-meta">
+                            <span class="video-channel-name">Loot2魯特</span>
+                            <span class="video-views">43萬次觀看</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- 捲動方向提示 -->
+            <div class="scroll-hint">← 左右滑動瀏覽更多影片 →</div>
+        </div>
+
+        <!-- 點選後展開的影片預覽區 -->
+        <div class="video-preview-panel" id="video-preview-panel">
+            <div class="video-embed-wrap" id="video-embed-wrap">
+                <!-- iframe 由 JS 動態注入，避免頁面載入時就請求 YouTube -->
+            </div>
+            <div class="video-preview-footer">
+                <div class="video-preview-title" id="video-preview-title"></div>
+                <a class="video-open-yt" id="video-open-yt" href="#" target="_blank" rel="noopener noreferrer">
+                    ▶ YouTube
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 模組 7：社群 & 互助平台 ── -->
+    <div class="module-card" id="section-community">
+        <h2 class="module-title"><span class="icon">🤝</span>環島騎士社群</h2>
+
+        <!-- 上半部：雷達 + 附近騎士列表 -->
+        <div class="community-top">
+
+            <!-- 雷達視覺 -->
+            <div class="radar-wrap">
+                <svg class="radar-svg" viewBox="0 0 118 118" xmlns="http://www.w3.org/2000/svg">
+                    <!-- 背景圓形 -->
+                    <circle cx="59" cy="59" r="57" fill="rgba(0,212,224,0.03)" stroke="rgba(0,212,224,0.15)" stroke-width="1"/>
+                    <!-- 同心環 -->
+                    <circle cx="59" cy="59" r="38" fill="none" stroke="rgba(0,212,224,0.10)" stroke-width="1"/>
+                    <circle cx="59" cy="59" r="19" fill="none" stroke="rgba(0,212,224,0.08)" stroke-width="1"/>
+                    <!-- 十字準線 -->
+                    <line x1="59" y1="4" x2="59" y2="114" stroke="rgba(0,212,224,0.07)" stroke-width="1"/>
+                    <line x1="4" y1="59" x2="114" y2="59" stroke="rgba(0,212,224,0.07)" stroke-width="1"/>
+                    <!-- 騎士 Blip 1：阿亮 (右上) -->
+                    <circle cx="81" cy="33" r="3.5" fill="#00D4E0">
+                        <animate attributeName="opacity" values="1;0.25;1" dur="2.1s" repeatCount="indefinite"/>
+                        <animate attributeName="r" values="3.5;5.5;3.5" dur="2.1s" repeatCount="indefinite"/>
+                    </circle>
+                    <!-- 騎士 Blip 2：小雨 (左下) -->
+                    <circle cx="34" cy="78" r="3.5" fill="#00D4E0">
+                        <animate attributeName="opacity" values="0.8;0.2;0.8" dur="1.7s" repeatCount="indefinite"/>
+                        <animate attributeName="r" values="3.5;5;3.5" dur="1.7s" repeatCount="indefinite"/>
+                    </circle>
+                    <!-- 騎士 Blip 3：老馬 (右) -->
+                    <circle cx="92" cy="62" r="3.5" fill="#00D4E0">
+                        <animate attributeName="opacity" values="0.9;0.3;0.9" dur="2.4s" repeatCount="indefinite"/>
+                        <animate attributeName="r" values="3.5;5;3.5" dur="2.4s" repeatCount="indefinite"/>
+                    </circle>
+                    <!-- 我（中心） -->
+                    <circle cx="59" cy="59" r="6" fill="rgba(0,212,224,0.2)"/>
+                    <circle cx="59" cy="59" r="3.5" fill="white"/>
+                    <circle cx="59" cy="59" r="2" fill="#00D4E0"/>
+                </svg>
+                <!-- 旋轉掃描疊加層 -->
+                <div class="radar-sweep-layer"></div>
+                <span class="radar-label">RADAR · 10 km</span>
+            </div>
+
+            <!-- 附近騎士列表 -->
+            <div class="rider-list">
+                <div class="rider-item">
+                    <div class="rider-avatar" style="background: linear-gradient(135deg,#7C3AED,#5B21B6);">亮</div>
+                    <div class="rider-info">
+                        <div class="rider-name">阿亮 <span class="rider-origin">台中出發</span></div>
+                        <div class="rider-status">
+                            <span class="status-sm riding"></span>行進中 · 向南
+                        </div>
+                    </div>
+                    <div class="rider-right">
+                        <div class="rider-dist">2.3 km</div>
+                        <button class="wave-btn" onclick="waveRider(this,'阿亮')">👋</button>
+                    </div>
+                </div>
+                <div class="rider-item">
+                    <div class="rider-avatar" style="background: linear-gradient(135deg,#0891B2,#155E75);">雨</div>
+                    <div class="rider-info">
+                        <div class="rider-name">小雨 <span class="rider-origin">高雄出發</span></div>
+                        <div class="rider-status">
+                            <span class="status-sm resting"></span>休息中 · 便利商店
+                        </div>
+                    </div>
+                    <div class="rider-right">
+                        <div class="rider-dist">4.7 km</div>
+                        <button class="wave-btn" onclick="waveRider(this,'小雨')">👋</button>
+                    </div>
+                </div>
+                <div class="rider-item">
+                    <div class="rider-avatar" style="background: linear-gradient(135deg,#B45309,#92400E);">馬</div>
+                    <div class="rider-info">
+                        <div class="rider-name">老馬 <span class="rider-origin">宜蘭出發</span></div>
+                        <div class="rider-status">
+                            <span class="status-sm seeking"></span>找加油站中
+                        </div>
+                    </div>
+                    <div class="rider-right">
+                        <div class="rider-dist">8.1 km</div>
+                        <button class="wave-btn" onclick="waveRider(this,'老馬')">👋</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分隔線 -->
+        <div class="community-divider"></div>
+
+        <!-- 即時動態牆 -->
+        <div class="feed-header">
+            <div class="feed-title">
+                <div class="feed-live-dot"></div>
+                路況即時動態
+            </div>
+            <span style="font-size:0.68rem; color:var(--text-dim);">附近 20 km</span>
+        </div>
+
+        <div class="community-feed" id="community-feed">
+            <div class="feed-item">
+                <div class="feed-avatar" style="background:linear-gradient(135deg,#0891B2,#155E75);">雨</div>
+                <div class="feed-body">
+                    <div class="feed-meta">小雨 <span>· 8 分鐘前 · 台9線 415K</span></div>
+                    <div class="feed-content">⚠️ 前方路面有落石清理，雙向通車，速度放慢！過了壽卡路況就好很多了</div>
+                    <div class="feed-actions">
+                        <span class="feed-like" onclick="likePost(this)">👍 12</span>
+                    </div>
+                </div>
+            </div>
+            <div class="feed-item">
+                <div class="feed-avatar" style="background:linear-gradient(135deg,#7C3AED,#5B21B6);">亮</div>
+                <div class="feed-body">
+                    <div class="feed-meta">阿亮 <span>· 23 分鐘前 · 大武鄉</span></div>
+                    <div class="feed-content">⛽ 大武加油站正常開放！距台9線 412K 路口約 300 公尺，有廁所可以休息</div>
+                    <div class="feed-actions">
+                        <span class="feed-like" onclick="likePost(this)">👍 28</span>
+                    </div>
+                </div>
+            </div>
+            <div class="feed-item">
+                <div class="feed-avatar" style="background:linear-gradient(135deg,#059669,#065F46);">琪</div>
+                <div class="feed-body">
+                    <div class="feed-meta">阿琪 <span>· 41 分鐘前 · 壽卡</span></div>
+                    <div class="feed-content">🏅 剛過壽卡！臺東縣界打卡完成，海風超大要注意！前方下坡順風騎很爽 🛵</div>
+                    <div class="feed-actions">
+                        <span class="feed-like" onclick="likePost(this)">👍 47</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 發布動態 Composer -->
+        <div class="post-composer">
+            <div class="composer-row">
+                <div class="composer-avatar">我</div>
+                <textarea id="post-input" rows="2" placeholder="分享路況、呼叫隊友、留下記號..."></textarea>
+            </div>
+            <!-- 快速路況標籤 -->
+            <div class="quick-tags">
+                <button class="quick-tag-btn" onclick="selectQuickTag('🛣️ 路況良好')">🛣️ 良好</button>
+                <button class="quick-tag-btn" onclick="selectQuickTag('⚠️ 前方施工注意')">⚠️ 施工</button>
+                <button class="quick-tag-btn" onclick="selectQuickTag('🌧️ 此處正在下雨')">🌧️ 下雨</button>
+                <button class="quick-tag-btn" onclick="selectQuickTag('⛽ 附近有加油站')">⛽ 油站</button>
+            </div>
+            <div class="post-submit-row">
+                <button class="post-btn" onclick="postStatus()">發布動態 →</button>
+            </div>
+        </div>
+    </div>
+
     <!-- ── 展示控制區（折疊收合）── -->
     <!-- 【優化6】預設收合，點擊 toggle 展開，不干擾正常使用者瀏覽體驗 -->
     <div class="demo-controls" id="demo-controls">
@@ -1067,17 +2097,18 @@
             <div class="nav-icon">⛽</div>
             <div class="nav-label">燃料</div>
         </div>
-        <div class="nav-item" data-target="section-accommodation">
-            <div class="nav-icon">🏨</div>
-            <div class="nav-label">住宿</div>
+        <div class="nav-item" data-target="section-videos">
+            <div class="nav-icon">▶️</div>
+            <div class="nav-label">靈感</div>
         </div>
         <div class="nav-item" data-target="section-sos">
             <div class="nav-icon">🚑</div>
             <div class="nav-label">救援</div>
         </div>
-        <div class="nav-item" data-target="section-home">
-            <div class="nav-icon">👤</div>
-            <div class="nav-label">我的</div>
+        <!-- 【新增】社群導航項目 -->
+        <div class="nav-item" data-target="section-community">
+            <div class="nav-icon">🤝</div>
+            <div class="nav-label">社群</div>
         </div>
     </nav>
 
@@ -1346,7 +2377,227 @@
         });
     });
 
-    // 頁面載入時初始化儀表盤為預設 70%
+    // ══════════════════════════════════════
+    // 模組 6：社群 & 互助平台 JavaScript
+    // ══════════════════════════════════════
+
+    // ── Toast 通知系統（單例）──
+    // 複用同一個 toast DOM 元素，避免多次觸發疊加
+    let toastTimer = null;
+
+    function showToast(msg) {
+        // 動態建立（若不存在）
+        let toast = document.getElementById('app-toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'app-toast';
+            toast.className = 'toast';
+            document.body.appendChild(toast);
+        }
+
+        // 清除上一個計時器，避免快速連點時 toast 提前消失
+        clearTimeout(toastTimer);
+        toast.classList.remove('show');
+
+        // 稍等一幀再顯示（讓 CSS transition 能順利觸發）
+        requestAnimationFrame(() => {
+            toast.textContent = msg;
+            toast.classList.add('show');
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
+        });
+    }
+
+    // ── 揮手功能 ──
+    // btn: 按下的按鈕元素，name: 對方騎士名稱
+    function waveRider(btn, name) {
+        // 防連點：若正在執行動畫則忽略
+        if (btn.classList.contains('waving')) return;
+
+        btn.classList.add('waving');
+        btn.textContent = '✅';
+
+        // 動畫結束後還原按鈕文字
+        setTimeout(() => {
+            btn.classList.remove('waving');
+            btn.textContent = '👋';
+        }, 600);
+
+        showToast(`👋 已向 ${name} 揮手！對方收到通知後會回應你`);
+    }
+
+    // ── 按讚功能 ──
+    function likePost(el) {
+        if (el.classList.contains('liked')) {
+            // 取消讚
+            el.classList.remove('liked');
+            const count = parseInt(el.textContent.replace('👍 ', '')) - 1;
+            el.textContent = `👍 ${count}`;
+        } else {
+            // 按讚
+            el.classList.add('liked');
+            const count = parseInt(el.textContent.replace('👍 ', '')) + 1;
+            el.textContent = `👍 ${count}`;
+        }
+    }
+
+    // ── 快速路況標籤 ──
+    // 點擊快速標籤時將文字填入 textarea
+    function selectQuickTag(text) {
+        const input = document.getElementById('post-input');
+        // 若已有其他內容則換行追加，否則直接填入
+        input.value = input.value.trim()
+            ? input.value.trim() + '\n' + text
+            : text;
+        input.focus();
+    }
+
+    // ── 發布動態 ──
+    // 將輸入框的內容新增至動態牆頂端
+    function postStatus() {
+        const input   = document.getElementById('post-input');
+        const content = input.value.trim();
+
+        if (!content) {
+            showToast('⚠️ 請先輸入路況內容再發布');
+            return;
+        }
+
+        const feed = document.getElementById('community-feed');
+
+        // 建立新 feed-item DOM
+        const item = document.createElement('div');
+        item.className = 'feed-item';
+        item.innerHTML = `
+            <div class="feed-avatar" style="background:linear-gradient(135deg,var(--primary-dim),#005F73);">我</div>
+            <div class="feed-body">
+                <div class="feed-meta">楊明杰（我）<span>· 剛剛 · 南迴公路段</span></div>
+                <div class="feed-content">${escapeHtml(content)}</div>
+                <div class="feed-actions">
+                    <span class="feed-like" onclick="likePost(this)">👍 0</span>
+                </div>
+            </div>
+        `;
+
+        // 插入到動態牆最頂端
+        feed.insertBefore(item, feed.firstChild);
+
+        // 清空輸入框並給予成功回饋
+        input.value = '';
+        showToast('✅ 動態已發布！附近騎士將收到通知');
+
+        // 自動捲動到最新貼文
+        feed.scrollTop = 0;
+    }
+
+    // ── HTML 轉義（防 XSS）──
+    // 使用者輸入的文字在插入 innerHTML 前必須轉義
+    function escapeHtml(str) {
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;')
+            .replace(/\n/g, '<br>'); // 保留換行
+    }
+
+    // ══════════════════════════════════════
+    // 模組 6：旅遊靈感影片 JavaScript
+    // ══════════════════════════════════════
+
+    // ── 頻道 Tab 篩選 ──
+    function switchVideoTab(btn) {
+        document.querySelectorAll('.video-tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        const selected = btn.dataset.channel;
+
+        document.querySelectorAll('#video-scroll .video-card').forEach(card => {
+            if (selected === 'all' || card.dataset.channel === selected) {
+                card.style.display = '';
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(8px)';
+                requestAnimationFrame(() => {
+                    card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                });
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        // Tab 切換時關閉預覽區
+        closeVideoPreview();
+    }
+
+    // ── 影片卡點擊 → 展開嵌入播放 ──
+    // 採「點擊才注入 iframe」策略，避免頁面載入時預先發出 6 支 YouTube 請求
+    function openVideoPreview(card) {
+        const videoId   = card.dataset.id;
+        const title     = card.dataset.title;
+        const isChannel = card.dataset.isChannel === 'true';
+        const panel     = document.getElementById('video-preview-panel');
+        const embedWrap = document.getElementById('video-embed-wrap');
+        const titleEl   = document.getElementById('video-preview-title');
+        const openBtn   = document.getElementById('video-open-yt');
+
+        // 再次點擊同一影片 → 關閉（Toggle）
+        if (panel.classList.contains('visible') &&
+            embedWrap.dataset.currentId === videoId) {
+            closeVideoPreview();
+            return;
+        }
+
+        embedWrap.dataset.currentId = videoId;
+
+        if (isChannel) {
+            // 鬧著玩為頻道連結，顯示引導畫面取代嵌入播放
+            embedWrap.innerHTML = `
+                <div style="
+                    width:100%; height:100%; min-height:140px;
+                    display:flex; flex-direction:column;
+                    align-items:center; justify-content:center;
+                    background:linear-gradient(135deg,#1a0a0a,#0D1117);
+                    gap:10px; padding:20px; text-align:center;
+                ">
+                    <div style="font-size:2.8rem;">🎉</div>
+                    <div style="font-size:0.88rem;color:var(--text-primary);font-weight:600;">鬧著玩娛樂頻道</div>
+                    <div style="font-size:0.73rem;color:var(--text-secondary);line-height:1.7;">
+                        此頻道影片內容豐富，建議前往<br>YouTube 頻道頁面直接瀏覽！
+                    </div>
+                </div>`;
+            openBtn.href = `https://www.youtube.com/@nowfun_tw`;
+        } else {
+            // 一般影片：注入 youtube-nocookie iframe（隱私增強模式）
+            // autoplay=1 點選後立即播放；rel=0 關閉相關推薦
+            embedWrap.innerHTML = `
+                <iframe
+                    src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1"
+                    title="${escapeHtml(title)}"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen
+                ></iframe>`;
+            openBtn.href = `https://www.youtube.com/watch?v=${videoId}`;
+        }
+
+        titleEl.textContent = title;
+        panel.classList.add('visible');
+
+        // 播放後稍等讓 DOM 更新完再捲動
+        setTimeout(() => {
+            panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+    }
+
+    // ── 關閉預覽，同時清空 iframe 停止串流（節省頻寬）──
+    function closeVideoPreview() {
+        const panel     = document.getElementById('video-preview-panel');
+        const embedWrap = document.getElementById('video-embed-wrap');
+        panel.classList.remove('visible');
+        embedWrap.innerHTML = '';
+        embedWrap.dataset.currentId = '';
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
         updateFuelLogic(70);
     });
